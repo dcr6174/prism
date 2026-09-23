@@ -32,7 +32,7 @@
   f(19, 'allowance', 'Daily time allowance', 'Focus & blocking', 'bg', true, 'Minutes per day per site, then blocked.', [t('rules', 'Rules (site = minutes)', ['youtube.com = 60'])]);
   f(20, 'lockdown', 'Lockdown mode', 'Focus & blocking', 'bg pop', true, 'For N minutes, only allowlisted sites open.', [t('allow', 'Allowlist', ['google.com', 'github.com', 'mail.google.com']), t('minutes', 'Default minutes', 50)]);
   f(21, 'friction', 'Friction unlock', 'Focus & blocking', 'bg', true, 'Unblock only after waiting or typing a sentence.', [t('seconds', 'Wait seconds', 30), t('sentence', 'Sentence to type', 'I am choosing to lose focus right now'), t('unlockMinutes', 'Unlock lasts (minutes)', 5)]);
-  f(22, 'pomodoro', 'Pomodoro', 'Focus & blocking', 'bg pop', true, 'Timer on the toolbar icon. Blocks your list while focusing.', [t('work', 'Focus minutes', 25), t('rest', 'Break minutes', 5), t('blockDuring', 'Block blocked-sites list during focus', true)]);
+  f(22, 'pomodoro', 'Pomodoro', 'Focus & blocking', 'bg pop nt', true, 'Live MM:SS countdown with a progress ring on the new tab and popup, minutes on the toolbar icon. Blocks your list while focusing.', [t('work', 'Focus minutes', 25), t('rest', 'Break minutes', 5), t('blockDuring', 'Block blocked-sites list during focus', true)]);
   f(23, 'blockmsg', 'Blocked-page message', 'Focus & blocking', 'bg', true, 'Your own line on the blocked page.', [t('message', 'Message', 'Back to the thing that matters.')]);
   // AI, NO KEYS
   f(24, 'aisummary', 'On-device summary', 'AI, no keys', 'pop cs', true, 'Summarise the page with Chrome\'s built-in Gemini Nano. Falls back to your chat site.');
@@ -180,7 +180,7 @@
   f(145, 'replay', 'Bug replay buffer', 'Recording', 'tool', true, 'Keeps the last ~30 s; save when a bug happens.');
   f(146, 'gif', 'GIF export', 'Recording', 'tool', true, 'Turn a short clip into a GIF.');
   // FOCUS / ADHD
-  f(147, 'tasktimer', 'Task timer', 'Focus / ADHD', 'pop nt', true, 'Start / stop, with a daily log.');
+  f(147, 'tasktimer', 'Task timer', 'Focus / ADHD', 'pop nt', true, 'Start / stop with a live H:MM:SS clock (seconds ticking), plus a daily log.');
   f(148, 'timedash', 'Site time dashboard', 'Focus / ADHD', 'bg tool', true, 'Where your day went, per site.');
   f(149, 'scrollstop', 'Infinite-scroll stopper', 'Focus / ADHD', 'cs', true, 'Pauses feeds after N screens.', [t('screens', 'Screens before pause', 15), t('sites', 'Sites', ['reddit.com', 'x.com', 'twitter.com', 'instagram.com', 'facebook.com', 'linkedin.com'])]);
   f(150, 'distractions', 'Hide distractions', 'Focus / ADHD', 'cs', true, 'YouTube recommendations, LinkedIn feed, X trends.', [t('yt', 'Hide YouTube home + sidebar recs', true), t('li', 'Hide LinkedIn feed', true), t('x', 'Hide X trends / who to follow', true)]);

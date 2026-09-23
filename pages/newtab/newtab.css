@@ -87,3 +87,19 @@ body { min-height: 100vh; }
 @keyframes tkMorph { 0% { transform: scale(.94); filter: blur(4px); opacity: .4; } 100% { transform: none; filter: none; opacity: 1; } }
 @media (max-width: 600px) { .tk-digits { font-size: 48px; } .tk-units { font-size: 48px; } }
 @media (prefers-reduced-motion: reduce) { .tk-blobs i, .tk-colon, .tk-bubble.jelly, .tk-card .tk-digits { animation: none !important; } }
+
+/* live timer cards (task timer, pomodoro) */
+.live-card { position: relative; overflow: hidden; isolation: isolate; transition: box-shadow .4s var(--ease); }
+.live-card::before { content: ''; position: absolute; width: 220px; height: 220px; right: -70px; top: -90px; border-radius: 50%; background: var(--accent); filter: blur(50px); opacity: 0; z-index: -1; transition: opacity .8s var(--ease); animation: tkBlob 12s ease-in-out infinite alternate; }
+.live-card.on::before { opacity: .35; }
+.live-card[data-phase=rest]::before { background: var(--ok); }
+.lc-digits { font-size: 44px; margin-top: 6px; }
+.lc-name { font-size: 13px; color: var(--ink2); display: flex; align-items: center; white-space: nowrap; min-height: 18px; }
+.lc-units { display: grid; grid-template-columns: repeat(3, calc(1.24em + .32em)); font-size: 44px; height: 14px; }
+.lc-units span { font-size: 10px; color: var(--ink3); text-transform: uppercase; letter-spacing: .08em; display: block; }
+.pm-top { display: flex; gap: 16px; align-items: center; }
+.pm-ring { width: 76px; height: 76px; flex: none; }
+.pm-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.pm-track { fill: none; stroke: color-mix(in srgb, var(--ink) 8%, transparent); stroke-width: 6; }
+.pm-prog { fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke .4s; }
+.live-card[data-phase=rest] .pm-prog { stroke: var(--ok); }

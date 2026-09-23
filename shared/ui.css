@@ -58,3 +58,17 @@ textarea { resize: vertical; min-height: 80px; }
 kbd { font: 11px var(--font); background: var(--sunk); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 5px; color: var(--ink2); }
 ::selection { background: var(--accent-soft); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* rolling clock digits */
+.roll { display: flex; align-items: center; font-weight: 600; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--ink); }
+.roll-slot { position: relative; display: inline-block; width: .62em; height: 1.08em; overflow: hidden; }
+.roll-d { position: absolute; inset: 0; display: grid; place-items: center; }
+.roll-d.in { animation: rollIn .52s var(--spring) both; } .roll-d.out { animation: rollOut .42s var(--ease) both; }
+@keyframes rollIn { from { transform: translateY(70%) scale(.7); filter: blur(6px); opacity: 0; } to { transform: none; filter: none; opacity: 1; } }
+@keyframes rollOut { to { transform: translateY(-70%) scale(.7); filter: blur(6px); opacity: 0; } }
+.roll-colon { width: .32em; text-align: center; opacity: .35; transform: translateY(-.05em); }
+.roll.live .roll-colon { animation: rollBlink 1s steps(1) infinite; }
+@keyframes rollBlink { 50% { opacity: .12; } }
+.live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); margin-right: 6px; animation: liveDot 1.4s var(--ease) infinite; vertical-align: middle; }
+@keyframes liveDot { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent); } 100% { box-shadow: 0 0 0 9px transparent; } }
+@media (prefers-reduced-motion: reduce) { .roll-colon, .live-dot { animation: none !important; } }

@@ -9,13 +9,13 @@ Everything stays on your computer. No account, no server, no tracking, no paid A
 | Popup (Alt+K) | Settings | Job tracker |
 |---|---|---|
 | ![Popup](docs/screenshots/popup-light.png) | ![Settings](docs/screenshots/options-dark.png) | ![Jobs](docs/screenshots/tools-jobs.png) |
-| ![Tatkal countdown](docs/screenshots/tatkal-light.png) | ![Search: your apps first](docs/screenshots/newtab-search.png) | |
+| ![Tatkal countdown](docs/screenshots/tatkal-light.png) | ![Search: your apps first](docs/screenshots/newtab-search.png) | ![Live timers](docs/screenshots/live-timers.png) |
 
 Full list: [docs/FEATURES.md](docs/FEATURES.md).
 
 ## What is inside
 
-- **New tab**: clock, one-line focus, search box that also does math (`= 12*18%`, `2.5 lakh in million`) and searches a site when you type its full name first (`youtube lofi`, `chatgpt explain X`, `claude`, `gemini`, `google`), quick links (they show first when your search matches them), to-do, weather (asks for your city, or uses your location only when you click "Use my location"), countdowns, recently closed tabs, a live Tatkal countdown, task timer, flashcards.
+- **New tab**: clock, one-line focus, search box that also does math (`= 12*18%`, `2.5 lakh in million`) and searches a site when you type its full name first (`youtube lofi`, `chatgpt explain X`, `claude`, `gemini`, `google`), quick links (they show first when your search matches them), to-do, weather (asks for your city, or uses your location only when you click "Use my location"), countdowns, recently closed tabs, a live Tatkal countdown, task timer and Pomodoro with ticking seconds, flashcards.
 - **Command palette**: press `Alt+K` anywhere. Search open tabs, bookmarks, history and about 110 actions.
 - **Tabs**: collapse all tabs into a list, named sessions, close duplicates, snooze a tab, sort and group by site, auto-sleep idle tabs.
 - **Focus**: a blocker that stops the page before it loads, schedules, daily time allowance, lockdown mode, Pomodoro on the toolbar icon, "why are you here?" prompt, time dashboard, feed hider, scroll stopper, grayscale sites.
@@ -71,6 +71,8 @@ Everything is in `chrome.storage.local` in this browser. Settings > **Backup** e
 The export includes things like clipboard history and any saved login cookies (Login switcher). Treat the file like a password. Do not share it or commit it anywhere.
 
 ## Honest limits
+
+- **Timers**: the task timer and Pomodoro tick every second on the new tab and in the popup. The toolbar badge shows whole minutes only, because Chrome lets the background wake about once every 30 seconds at most. A full 25-minute Pomodoro running into its break has not been tested yet.
 
 - **Screen recorder format**: Chrome records MP4 (H.264) directly, so there is no conversion step and nothing is uploaded. On an older Chrome that cannot record MP4, you get a WebM file instead and the page tells you so. Checked in Chrome 151: an MP4 file is produced from a test stream. A real screen + mic recording has not been tried yet.
 

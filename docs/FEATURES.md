@@ -37,7 +37,7 @@ Every feature has an on/off switch in Settings. "Where" tells you how you reach 
 | 19 | Daily time allowance | Minutes per day per site, then blocked. | Background |
 | 20 | Lockdown mode | For N minutes, only allowlisted sites open. | Background, Popup / Alt+K |
 | 21 | Friction unlock | Unblock only after waiting or typing a sentence. | Background |
-| 22 | Pomodoro | Timer on the toolbar icon. Blocks your list while focusing. | Background, Popup / Alt+K |
+| 22 | Pomodoro | Live MM:SS countdown with a progress ring on the new tab and popup, minutes on the toolbar icon. Blocks your list while focusing. | Background, Popup / Alt+K, New tab |
 | 23 | Blocked-page message | Your own line on the blocked page. | Background |
 
 ## AI, no keys
@@ -277,7 +277,7 @@ Every feature has an on/off switch in Settings. "Where" tells you how you reach 
 
 | # | Feature | What it does | Where |
 |---|---|---|---|
-| 147 | Task timer | Start / stop, with a daily log. | Popup / Alt+K, New tab |
+| 147 | Task timer | Start / stop with a live H:MM:SS clock (seconds ticking), plus a daily log. | Popup / Alt+K, New tab |
 | 148 | Site time dashboard | Where your day went, per site. | Background, Tools page |
 | 149 | Infinite-scroll stopper | Pauses feeds after N screens. | On pages |
 | 150 | Hide distractions | YouTube recommendations, LinkedIn feed, X trends. | On pages |

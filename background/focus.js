@@ -146,8 +146,8 @@ BG.def('lockdown', {
 });
 BG.def('pomodoro', {
   msg: {
-    'pomo:start': async () => { const st = await Focus.get(); st.pomo = { phase: 'work', ends: Date.now() + (BG.cfg('pomodoro').work || 25) * 60000, cycles: st.pomo.cycles || 0 }; await Focus.set(st); await Focus.sync(); await Focus.badge(); return st.pomo; },
-    'pomo:stop': async () => { const st = await Focus.get(); st.pomo = { phase: 'idle', ends: 0, cycles: st.pomo.cycles || 0 }; await Focus.set(st); await Focus.sync(); await Focus.badge(); return st.pomo; },
+    'pomo:start': async () => { const st = await Focus.get(); st.pomo = { phase: 'work', ends: Date.now() + (BG.cfg('pomodoro').work || 25) * 60000, cycles: st.pomo.cycles || 0 }; await Focus.set(st); chrome.alarms.create('pomo-end', { when: st.pomo.ends }); await Focus.sync(); await Focus.badge(); return st.pomo; },
+    'pomo:stop': async () => { const st = await Focus.get(); st.pomo = { phase: 'idle', ends: 0, cycles: st.pomo.cycles || 0 }; await Focus.set(st); chrome.alarms.clear('pomo-end'); await Focus.sync(); await Focus.badge(); return st.pomo; },
     'pomo:state': async () => (await Focus.get()).pomo,
   },
   commands: { 'pomodoro-toggle': async () => { const st = await Focus.get(); await BG.msg[st.pomo.phase === 'idle' ? 'pomo:start' : 'pomo:stop'].fn({}); } },
@@ -175,14 +175,15 @@ BG.def('breaknudge', {});
 /* Every minute: flush time, refresh blocks (schedules / allowance / lockdown / pomodoro phases), nudge breaks. */
 BG.def('core-focus-tick', {
   alarms: {
+    'pomo-end': async () => BG.alarms['focus-tick'].fn(),
     'focus-tick': async () => {
       await TT.flush();
       const st = await Focus.get(); const now = Date.now();
       let changed = false;
       for (const h in st.unlock) if (st.unlock[h] < now) { delete st.unlock[h]; changed = true; }
-      if (st.pomo.phase !== 'idle' && st.pomo.ends <= now) {
+      if (st.pomo.phase !== 'idle' && st.pomo.ends <= now + 1500) {
         const c = BG.cfg('pomodoro');
-        if (st.pomo.phase === 'work') { st.pomo = { phase: 'rest', ends: now + (c.rest || 5) * 60000, cycles: (st.pomo.cycles || 0) + 1 }; BG.notify('Focus done', 'Take ' + (c.rest || 5) + ' minutes. You earned it.'); }
+        if (st.pomo.phase === 'work') { st.pomo = { phase: 'rest', ends: now + (c.rest || 5) * 60000, cycles: (st.pomo.cycles || 0) + 1 }; chrome.alarms.create('pomo-end', { when: st.pomo.ends }); BG.notify('Focus done', 'Take ' + (c.rest || 5) + ' minutes. You earned it.'); }
         else { st.pomo = { phase: 'idle', ends: 0, cycles: st.pomo.cycles }; BG.notify('Break over', 'Start the next focus block when ready.'); }
         changed = true;
       }

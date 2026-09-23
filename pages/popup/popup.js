@@ -36,10 +36,12 @@ function page() {
 async function focus() {
   const box = $('#focus');
   if (S.on.pomodoro) {
-    const p = await UI.send({ type: 'pomo:state' });
-    const left = p && p.phase !== 'idle' ? Math.max(0, Math.ceil((p.ends - Date.now()) / 60000)) : S.cfg.pomodoro.work;
-    box.append(h('div', { class: 'grp' }, 'Pomodoro'), h('div', { class: 'row' }, h('span', { class: 'big grow' }, left + ' min' + (p && p.phase === 'rest' ? ' break' : '')),
-      h('button', { class: 'btn primary', onclick: async () => { await UI.send({ type: p && p.phase !== 'idle' ? 'pomo:stop' : 'pomo:start' }); window.close(); } }, p && p.phase !== 'idle' ? 'Stop' : 'Start focus')));
+    let p = (await UI.send({ type: 'pomo:state' })) || { phase: 'idle' };
+    const r = UI.roll('00:00', 'pop-digits'); const lab = h('span', { class: 'muted small' });
+    const paint = (anim) => { const c = S.cfg.pomodoro; const on = p.phase !== 'idle'; r.set(UI.hms(on ? p.ends - Date.now() : (c.work || 25) * 60000, false), anim); r.el.classList.toggle('live', on); lab.textContent = p.phase === 'work' ? 'Focus' : p.phase === 'rest' ? 'Break' : 'Ready'; };
+    paint(false); UI.everySecond(() => p.phase !== 'idle' && paint(true));
+    box.append(h('div', { class: 'grp' }, 'Pomodoro'), h('div', { class: 'row' }, h('div', { class: 'grow' }, lab, r.el),
+      h('button', { class: 'btn primary', onclick: async () => { await UI.send({ type: p.phase !== 'idle' ? 'pomo:stop' : 'pomo:start' }); window.close(); } }, p.phase !== 'idle' ? 'Stop' : 'Start focus')));
   }
   if (S.on.lockdown) {
     const until = await UI.send({ type: 'lockdown:state' });
@@ -49,8 +51,11 @@ async function focus() {
   if (S.on.tasktimer) {
     const st = await PrismStore.get('tasktimer', { running: null, log: [] });
     const inp = h('input', { placeholder: 'Task name' });
-    box.append(h('div', { class: 'grp' }, 'Task timer'), st.running ? h('div', { class: 'row' }, h('span', { class: 'grow' }, st.running.name + ' · ' + U.fmtMin(Date.now() - st.running.start)), h('button', { class: 'btn primary small', onclick: async () => { st.log.unshift({ name: st.running.name, start: st.running.start, end: Date.now() }); st.running = null; await PrismStore.set('tasktimer', st); toast('Stopped'); window.close(); } }, 'Stop'))
-      : h('div', { class: 'row' }, inp, h('button', { class: 'btn primary small', onclick: async () => { st.running = { name: inp.value || 'Task', start: Date.now() }; await PrismStore.set('tasktimer', st); toast('Timer started'); } }, 'Start')));
+    let row;
+    if (st.running) { const r = UI.roll('00:00:00', 'pop-digits live'); r.set(UI.hms(Date.now() - st.running.start), false); UI.everySecond(() => r.set(UI.hms(Date.now() - st.running.start)));
+      row = h('div', { class: 'row' }, h('div', { class: 'grow' }, h('span', { class: 'muted small' }, st.running.name), r.el), h('button', { class: 'btn primary small', onclick: async () => { st.log.unshift({ name: st.running.name, start: st.running.start, end: Date.now() }); st.running = null; await PrismStore.set('tasktimer', st); toast('Stopped'); window.close(); } }, 'Stop')); }
+    else row = h('div', { class: 'row' }, inp, h('button', { class: 'btn primary small', onclick: async () => { st.running = { name: inp.value || 'Task', start: Date.now() }; await PrismStore.set('tasktimer', st); toast('Timer started'); window.close(); } }, 'Start'));
+    box.append(h('div', { class: 'grp' }, 'Task timer'), row);
   }
   if (S.on.timedash) {
     const t = await PrismStore.get('time:' + U.today(), {});

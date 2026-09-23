@@ -11,7 +11,7 @@ let S;
     q.focus();
     addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); q.focus(); q.select(); } });
   }
-  clock(); links(); todo(); weather(); countdowns(); closed(); tatkal(); timer(); flash();
+  clock(); links(); todo(); weather(); countdowns(); closed(); tatkal(); timer(); pomodoro(); flash();
 })();
 
 function clock() {
@@ -170,10 +170,11 @@ function tatkal() {
     const open = openFor(cur); const left = tatkalNext(cur.hr) - Date.now();
     const sec = Math.max(0, Math.floor(left / 1000));
     const str = String(Math.floor(sec / 3600)).padStart(2, '0') + String(Math.floor(sec % 3600 / 60)).padStart(2, '0') + String(sec % 60).padStart(2, '0');
-    if (open) '000000'.split('').forEach((d, i) => setDigit(slots[i], d, animate)); else str.split('').forEach((d, i) => setDigit(slots[i], d, animate));
+    if (open) UI.hms(Date.now() - (tatkalNext(cur.hr) - 864e5)).split('').forEach((d, i) => setDigit(slots[i], d, animate)); else str.split('').forEach((d, i) => setDigit(slots[i], d, animate));
     bar.firstChild.style.transform = `scaleX(${open ? 1 : Math.min(1, 1 - left / 864e5)})`;
     const state = open ? 'open' : sec <= 300 ? 'now' : sec <= 3600 ? 'soon' : 'far';
     card.dataset.tk = state;
+    units.children[0].textContent = open ? 'open for' : 'hours';
     note.textContent = open ? cur.label + ' Tatkal is OPEN - go now' : state === 'now' ? 'Get ready - log in to IRCTC now' : state === 'soon' ? 'Under an hour. Keep your passenger list ready.' : 'Opens ' + cur.time + ' IST, one day before travel';
     book.hidden = !(open || state === 'now');
   };
@@ -183,23 +184,58 @@ function tatkal() {
   const loop = () => { draw(true); setTimeout(loop, 1000 - Date.now() % 1000 + 5); };
   setTimeout(loop, 1000 - Date.now() % 1000 + 5);
 }
+/* Task timer (147): live H:MM:SS with rolling digits. */
 async function timer() {
   if (!S.on.tasktimer) return;
-  const box = $('#timer');
+  const box = $('#timer'); const card = box.closest('.card'); card.classList.add('live-card');
+  let stopTick = null;
   const draw = async () => {
+    stopTick && stopTick(); stopTick = null;
     const st = await PrismStore.get('tasktimer', { running: null, log: [] });
-    box.innerHTML = '';
+    box.innerHTML = ''; card.classList.toggle('on', !!st.running);
     if (st.running) {
-      const el = h('div', { class: 'big' }); const up = () => el.textContent = U.fmtMin(Date.now() - st.running.start) + ' · ' + st.running.name; up(); clearInterval(box._i); box._i = setInterval(up, 15000);
-      box.append(el, h('button', { class: 'btn primary small', onclick: async () => { st.log.unshift({ name: st.running.name, start: st.running.start, end: Date.now() }); st.running = null; await PrismStore.set('tasktimer', st); draw(); } }, 'Stop'));
+      const r = UI.roll('00:00:00', 'live lc-digits');
+      r.set(UI.hms(Date.now() - st.running.start), false);
+      box.append(h('div', { class: 'lc-name' }, h('span', { class: 'live-dot' }), st.running.name), r.el, h('div', { class: 'lc-units' }, h('span', {}, 'hours'), h('span', {}, 'min'), h('span', {}, 'sec')),
+        h('div', { class: 'row', style: { marginTop: '12px' } }, h('button', { class: 'btn primary small', onclick: async () => { st.log.unshift({ name: st.running.name, start: st.running.start, end: Date.now() }); st.running = null; await PrismStore.set('tasktimer', st); draw(); } }, 'Stop')));
+      stopTick = UI.everySecond(() => r.set(UI.hms(Date.now() - st.running.start)));
     } else {
       const inp = h('input', { placeholder: 'What are you working on?' });
-      box.append(h('div', { class: 'row' }, inp, h('button', { class: 'btn primary small', onclick: async () => { st.running = { name: inp.value || 'Task', start: Date.now() }; await PrismStore.set('tasktimer', st); draw(); } }, 'Start')));
+      const go = async () => { st.running = { name: inp.value.trim() || 'Task', start: Date.now() }; await PrismStore.set('tasktimer', st); draw(); };
+      inp.addEventListener('keydown', (e) => e.key === 'Enter' && go());
+      box.append(h('div', { class: 'row' }, inp, h('button', { class: 'btn primary small', onclick: go }, 'Start')));
     }
+    const fmt = (ms) => { const t = UI.hms(ms); return (t.slice(0, 2) !== '00' ? +t.slice(0, 2) + 'h ' : '') + +t.slice(2, 4) + 'm ' + t.slice(4) + 's'; };
     const today = st.log.filter(l => new Date(l.start).toDateString() === new Date().toDateString());
-    if (today.length) box.append(h('div', { class: 'faint small', style: { marginTop: '8px' } }, 'Today: ' + today.map(l => l.name + ' ' + U.fmtMin(l.end - l.start)).join(' · ')));
+    if (today.length) box.append(h('div', { class: 'faint small', style: { marginTop: '10px' } }, 'Today: ' + today.map(l => l.name + ' ' + fmt(l.end - l.start)).join(' · ')));
   };
   draw();
+}
+/* Pomodoro (22) on the new tab: live MM:SS with a progress ring. The background owns the timer. */
+async function pomodoro() {
+  const card = $('[data-feature=pomodoro]'); if (!S.on.pomodoro) return;
+  const box = $('#pomo'); card.classList.add('live-card');
+  const R = 34, C = 2 * Math.PI * R;
+  const ring = h('div', { class: 'pm-ring' }); ring.innerHTML = `<svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="${R}" class="pm-track"/><circle cx="40" cy="40" r="${R}" class="pm-prog" stroke-dasharray="${C}" stroke-dashoffset="${C}"/></svg>`;
+  const r = UI.roll('00:00', 'live lc-digits');
+  const phase = h('div', { class: 'lc-name' }); const btn = h('button', { class: 'btn primary small' });
+  box.append(h('div', { class: 'pm-top' }, ring, h('div', {}, phase, r.el)), h('div', { class: 'row', style: { marginTop: '12px' } }, btn));
+  let p = { phase: 'idle' };
+  const refresh = async () => { p = (await UI.send({ type: 'pomo:state' })) || { phase: 'idle' }; paint(false); };
+  const paint = (animate = true) => {
+    const c = S.cfg.pomodoro; const on = p.phase !== 'idle';
+    const total = (p.phase === 'rest' ? (c.rest || 5) : (c.work || 25)) * 60000;
+    const left = on ? Math.max(0, p.ends - Date.now()) : total;
+    r.set(UI.hms(left, false), animate); r.el.classList.toggle('live', on);
+    card.classList.toggle('on', on); card.dataset.phase = p.phase;
+    phase.innerHTML = ''; phase.append(on ? h('span', { class: 'live-dot' }) : '', p.phase === 'work' ? 'Focus' : p.phase === 'rest' ? 'Break' : 'Ready - ' + (c.work || 25) + ' min focus');
+    ring.querySelector('.pm-prog').setAttribute('stroke-dashoffset', String(C * (on ? 1 - left / total : 0)));
+    btn.textContent = on ? 'Stop' : 'Start focus';
+    if (on && left <= 0) setTimeout(refresh, 2500);
+  };
+  btn.onclick = async () => { await UI.send({ type: p.phase !== 'idle' ? 'pomo:stop' : 'pomo:start' }); refresh(); };
+  PrismStore.onChange((ch) => { if (ch.focus) refresh(); });
+  await refresh(); UI.everySecond(() => p.phase !== 'idle' && paint());
 }
 async function flash() {
   if (!S.on.flashcards) return;
