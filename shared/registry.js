@@ -162,7 +162,7 @@
   f(131, 'dlpanel', 'Downloads panel', 'Downloads', 'tool', true, 'Search, open, re-download.');
   f(132, 'batchdl', 'Batch download', 'Downloads', 'pop tool', true, 'All images / PDFs on a page, filtered.');
   // PDF
-  f(133, 'pdftools', 'Merge / split / rotate PDF', 'PDF (local)', 'tool', true, 'All local, nothing uploaded.');
+  f(133, 'pdftools', 'PDF Studio', 'PDF (local)', 'tool', true, '16 local tools: organize pages, watermark, number, resize, crop and more.');
   f(134, 'pdfsign', 'Fill + sign PDF', 'PDF (local)', 'tool', true, 'Fill form fields, draw or type a signature.');
   f(135, 'img2pdf', 'Images to PDF', 'PDF (local)', 'tool', true, 'Photos to one PDF.');
   f(136, 'imgcompress', 'Image compress', 'PDF (local)', 'tool', true, 'Get an image under 200 KB (or any size) for portals.');
@@ -200,3 +200,4 @@
   g.PRISM_FEATURES = L;
   g.PRISM_BY_ID = Object.fromEntries(L.map(x => [x.id, x]));
 })(typeof globalThis !== 'undefined' ? globalThis : self);
+

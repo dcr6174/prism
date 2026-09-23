@@ -14,3 +14,6 @@ footer { margin-top: 14px; } footer a { color: var(--ink3); }
 section { animation: fadeIn .35s var(--ease) both; }
 textarea#scratch { min-height: 150px; }
 .pop-digits { font-size: 30px; margin-top: 2px; }
+
+
+.pp { padding:18px; }.head input { border:1px solid var(--line); border-radius:17px; }.tabs { padding:5px; }.tabs button.on { color:var(--accent); }.chip { background:var(--lilac); box-shadow:none; min-height:34px; }.chip:nth-child(3n+2) { background:var(--peach); }.chip:nth-child(3n+3) { background:var(--mint); }.grp { margin-top:20px; }footer { border-top:1px solid var(--line); padding-top:16px; }

@@ -103,3 +103,16 @@ body { min-height: 100vh; }
 .pm-track { fill: none; stroke: color-mix(in srgb, var(--ink) 8%, transparent); stroke-width: 6; }
 .pm-prog { fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke .4s; }
 .live-card[data-phase=rest] .pm-prog { stroke: var(--ok); }
+
+
+/* A soft, colorful start page using the shared studio tokens. */
+.nt { max-width:1000px; padding-top:6vh; }
+.top { padding:0 8px; }.time { color:var(--accent); }
+.search input { border:1px solid var(--line); padding:19px 23px; border-radius:24px; }
+.links .ic { border-radius:16px; background:var(--lilac); width:46px; height:46px; }
+.links a:nth-child(3n+2) .ic { background:var(--peach); }.links a:nth-child(3n+3) .ic { background:var(--mint); }
+.grid { gap:18px; }.grid .card { border-radius:24px; }.grid .card h3 { color:var(--ink); font-weight:600; }
+.grid .card[data-feature=todo] { border-top:4px solid var(--lilac); }.grid .card[data-feature=countdowns] { border-top:4px solid var(--peach); }.grid .card[data-feature=recentclosed] { border-top:4px solid var(--mint); }
+.nt-launcher { display:flex; justify-content:center; gap:8px; margin:0 0 26px; flex-wrap:wrap; }.nt-launcher a { background:var(--surface); border:1px solid var(--line); }
+.links a:focus-within .del { opacity:1; }
+@media(max-width:480px) { .top { align-items:flex-start; gap:20px; flex-wrap:wrap; }.weather { text-align:left; }.wask { align-items:flex-start; }.nt { padding:28px 16px; } }

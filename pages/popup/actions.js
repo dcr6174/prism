@@ -103,7 +103,8 @@
   a('pricelog', 'Price log', tool('prices'));
   a('batchdl', 'Batch download images / PDFs', tab('batchdl', 'collect'), { page: true });
   a('dlpanel', 'Downloads panel', tool('downloads'));
-  a('pdftools', 'PDF merge / split / rotate', tool('pdf'));
+  a('pdftools', 'PDF Studio: merge, split, rotate, watermark', tool('pdf'));
+  for (const [mode, label] of [['extract', 'Extract PDF pages'], ['remove', 'Remove PDF pages'], ['reorder', 'Reorder PDF pages'], ['numbers', 'Add PDF page numbers'], ['resize', 'Resize PDF pages'], ['crop', 'Crop PDF margins'], ['metadata', 'Edit PDF metadata'], ['flatten', 'Flatten PDF forms'], ['attach', 'Attach files to PDF'], ['optimize', 'Optimize PDF structure']]) a('pdftools', label, tool('pdf?mode=' + mode));
   a('pdfsign', 'Fill + sign PDF', tool('sign'));
   a('img2pdf', 'Images to PDF', tool('img2pdf'));
   a('imgcompress', 'Compress image under 200 KB', tool('compress'));
@@ -123,3 +124,4 @@
   a('core', 'PRISM tools', tool(''));
   g.PRISM_ACTIONS = A;
 })(self);
+

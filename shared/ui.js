@@ -18,7 +18,7 @@
   };
   let toastEl;
   const toast = (msg) => {
-    if (!toastEl) { toastEl = h('div', { class: 'toast' }); document.body.append(toastEl); }
+    if (!toastEl) { toastEl = h('div', { class: 'toast', role: 'status', 'aria-live': 'polite' }); document.body.append(toastEl); }
     toastEl.textContent = msg; toastEl.classList.add('show');
     clearTimeout(toastEl._t); toastEl._t = setTimeout(() => toastEl.classList.remove('show'), 1800);
   };
@@ -41,3 +41,4 @@
   const everySecond = (fn) => { let on = true; const loop = () => { if (!on) return; fn(); setTimeout(loop, 1000 - Date.now() % 1000 + 5); }; loop(); return () => { on = false; }; };
   g.UI = { $, $$, h, toast, copy, theme, logo, send, download, switchEl, ago, roll, hms, everySecond };
 })(self);
+
