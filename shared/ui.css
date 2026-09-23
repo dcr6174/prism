@@ -72,3 +72,40 @@ kbd { font: 11px var(--font); background: var(--sunk); border: 1px solid var(--l
 .live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); margin-right: 6px; animation: liveDot 1.4s var(--ease) infinite; vertical-align: middle; }
 @keyframes liveDot { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent); } 100% { box-shadow: 0 0 0 9px transparent; } }
 @media (prefers-reduced-motion: reduce) { .roll-colon, .live-dot { animation: none !important; } }
+
+
+/* PRISM studio palette: soft color, tactile controls, readable contrast. */
+:root {
+  --bg: #f7f7fc; --surface: #fff; --sunk: #f0f0f8; --line: #e4e3ef;
+  --ink: #25223b; --ink2: #686479; --ink3: #756f87;
+  --accent: #6b4de6; --accent-soft: #eee9ff; --accent-ink: #fff;
+  --r: 24px; --r-sm: 13px;
+  --shadow: 0 3px 5px #33255b02, 0 12px 38px #33255b06;
+  --lilac: #eee8ff; --peach: #fff0e2; --mint: #e3f5ed; --rose: #fce8f0; --blue: #e6f1ff;
+}
+:root[data-theme='dark'] {
+  --bg: #151421; --surface: #201e30; --sunk: #29263b; --line: #38344c;
+  --ink: #f4efff; --ink2: #b9b1cd; --ink3: #a49ab9;
+  --accent: #b9a5ff; --accent-soft: #35294f; --accent-ink: #201632;
+  --lilac: #352b50; --peach: #433329; --mint: #223e37; --rose: #442b3e; --blue: #26364f;
+  --shadow: 0 12px 38px #0002;
+}
+@media(prefers-color-scheme:dark) { :root[data-theme='auto'] {
+  --bg: #151421; --surface: #201e30; --sunk: #29263b; --line: #38344c;
+  --ink: #f4efff; --ink2: #b9b1cd; --ink3: #a49ab9;
+  --accent: #b9a5ff; --accent-soft: #35294f; --accent-ink: #201632;
+  --lilac: #352b50; --peach: #433329; --mint: #223e37; --rose: #442b3e; --blue: #26364f;
+  --shadow: 0 12px 38px #0002;
+} }
+h1 { letter-spacing: -.045em; }
+.btn { min-height: 38px; font-weight: 500; }
+.btn.small { min-height: 32px; }
+.btn.primary { box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 18%, transparent); }
+.btn:disabled, button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.card { border: 1px solid var(--line); padding: 22px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.switch:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 99px; }
+[hidden] { display: none !important; }
+input[type=checkbox] { accent-color: var(--accent); }
+input::placeholder, textarea::placeholder { color: var(--ink3); opacity: 1; }
+.toast { max-width: min(90vw, 620px); border-radius: 16px; }

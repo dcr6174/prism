@@ -1,0 +1,19 @@
+name: Checks
+on:
+  push:
+  pull_request:
+jobs:
+  pdf-and-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          find background content pages shared tests -type f \( -name '*.js' -o -name '*.cjs' \) | while read -r file; do node --check "$file"; done
+      - name: Validate manifest
+        run: node -e "const m=require('./manifest.json'); if(m.manifest_version!==3) process.exit(1)"
+      - name: Verify generated PDF operations
+        run: node --test tests/pdf-engine.test.cjs

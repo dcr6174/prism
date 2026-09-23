@@ -302,3 +302,9 @@ Every feature has an on/off switch in Settings. "Where" tells you how you reach 
 | 159 | New-site badge | Tells you when you have never been to a site before. | On pages, Background |
 | 160 | Extension permission audit | Your extensions ranked by risk. | Tools page |
 
+
+
+
+## PDF Studio upgrade
+
+The Tools page includes 16 local PDF operations: merge, extract, split, remove, reorder or duplicate, reverse, rotate, watermark, page numbers, resize, crop, insert blank pages, edit metadata, flatten form fields, attach files and structural optimization. The improved fill/sign and Images to PDF screens support preview, better controls, explicit file limits and safer error handling. See README for operational limits.

@@ -1,6 +1,6 @@
 # PRISM
 
-160 small browser tools in one quiet Chrome extension. New tab, command palette, tab tools, a real site blocker, job-hunt helpers, a QA kit, PDF and image tools, a screen recorder and more.
+160 small browser tools in one colorful Chrome extension. New tab, command palette, tab tools, a real site blocker, job-hunt helpers, a QA kit, PDF and image tools, a screen recorder and more.
 
 Everything stays on your computer. No account, no server, no tracking, no paid API.
 
@@ -23,7 +23,7 @@ Full list: [docs/FEATURES.md](docs/FEATURES.md).
 - **Reading**: reader mode, page to Markdown, tables to CSV, reading list with an offline copy, highlights that come back when you revisit, recipe mode, real publish date, read aloud.
 - **QA / dev kit**: bug report with console errors, Playwright locator picker, fake-data form filler, right-click test strings, JSON viewer, cookie and localStorage editor, ruler, colour picker, broken-link check, accessibility and speed checks.
 - **Job hunt**: save a job in one click, pipeline board with CSV export, keyword highlighter, application autofill from your profile, filter promoted/applied jobs on LinkedIn, Naukri and Indeed, job age and applicant count on LinkedIn.
-- **Files and capture**: full-page screenshot with arrows/boxes/blur, PDF merge/pick pages/rotate, fill and sign a PDF, images to PDF, compress an image under 200 KB, screen recorder with mic and webcam bubble (download as MP4), "save the last 30 seconds" replay buffer, video to GIF. All done in the browser; nothing is uploaded.
+- **Files and capture**: full-page screenshot with arrows/boxes/blur, PDF Studio (16 local operations including merge, split, reorder, crop, page numbers, watermark, resize, flatten forms and attach files), fill and sign a PDF, images to PDF, compress an image under 200 KB, screen recorder with mic and webcam bubble (download as MP4), "save the last 30 seconds" replay buffer, video to GIF. All done in the browser; nothing is uploaded.
 - **India daily life**: lakh/crore ↔ million on any number you select, PAN/Aadhaar/phone masking before screenshots, IRCTC passenger fill (you still solve the captcha and press every button).
 - **Gmail**: saved-reply templates, read-tracker blocking, unsubscribe chip, "you forgot the attachment" check.
 - **Trust and safety**: warning on lookalike, punycode and shortened links; a note on the first visit to a new site.
@@ -70,6 +70,18 @@ Everything is in `chrome.storage.local` in this browser. Settings > **Backup** e
 
 The export includes things like clipboard history and any saved login cookies (Login switcher). Treat the file like a password. Do not share it or commit it anywhere.
 
+## PDF Studio
+
+Open **Tools → PDF Studio** to find, favorite and run 16 local operations. Drag PDFs into the workspace, arrange their order, choose an operation and preview its result before downloading. The original files are not modified, and the document bytes remain in the page's memory. Merge handles multiple PDFs; other operations work on one PDF at a time. Splitting produces a separate download for each part. The command palette also links directly to common PDF operations.
+
+| Pages | Finishing | Document |
+|---|---|---|
+| Merge, extract, split, remove, reorder, reverse, rotate, add a blank page | Watermark, page numbers, crop visible margins, fit content on A4/A5/Letter | Edit title/author/subject/keywords, flatten forms, attach files, optimize structure |
+
+Fill & sign supports text fields, checkboxes, dropdowns, option lists and radio groups, plus a visual signature. Images to PDF supports manual page order, orientation, margins, paper size and image quality. PDF and GIF libraries load only when their respective tools open, which keeps the rest of Tools faster.
+
+**Limits:** Password-protected files, OCR, Office conversion, PDF-to-image rendering, secure redaction, certificate-based signatures and PDF/A validation need additional specialist engines and are not offered. Crop only changes the visible area; it is not redaction. Resizing copies visible page content and does not retain interactive elements on those pages. Page-copy operations may not preserve document-level bookmarks, attachments and interactive fields. PDF edits may invalidate existing digital signatures. Text watermarks and page numbers use a bundled Latin font and currently require pages with zero rotation. Structural optimization does not downsample images, so some files may grow. The workspace limits batches to 40 PDFs/150 MB, or 50 images/150 MB, to avoid browser memory exhaustion.
+
 ## Honest limits
 
 - **Timers**: the task timer and Pomodoro tick every second on the new tab and in the popup. The toolbar badge shows whole minutes only, because Chrome lets the background wake about once every 30 seconds at most. A full 25-minute Pomodoro running into its break has not been tested yet.
@@ -78,7 +90,7 @@ The export includes things like clipboard history and any saved login cookies (L
 
 - **Tested so far**: automated checks in headless Chrome on a local test page. The extension loads; all 46 background features start with no errors; 74 page features load on a web page with no errors; 47 page actions run (2 are pickers that wait for your click, and translation needs Chrome's on-device model, which the test browser does not have); all 31 Tools sections open; new tab, popup and Settings open with no errors.
 - **Not tested yet on real sites**: Gmail, LinkedIn, Naukri, Indeed, IRCTC, YouTube, Amazon, Flipkart, Myntra, X, Reddit, and the ChatGPT/Claude/Gemini auto-fill. These features read the site's page layout, and sites change their layout often. Expect some to need fixes.
-- **Not tested yet at all**: on-device AI (Summarizer, Rewriter, Proofreader, Translator), screen recorder, replay buffer, webcam bubble, video to GIF, PDF tools and signing with real PDFs, image compression, downloads rename/sort rules, blocker schedules and alarms over real time, keyboard shortcuts, right-click menus, desktop notifications, the login switcher, and the price and page monitors over several hours.
+- **Not tested yet at all**: on-device AI (Summarizer, Rewriter, Proofreader, Translator), screen recorder, replay buffer, webcam bubble, video to GIF, PDF Studio interface in an unpacked browser (PDF engine checks use real generated PDF files), signing on real customer forms, image compression, downloads rename/sort rules, blocker schedules and alarms over real time, keyboard shortcuts, right-click menus, desktop notifications, the login switcher, and the price and page monitors over several hours.
 - Price watch and page monitor only check while Chrome is open.
 - The blocker is a speed bump, not a lock. Anyone can turn PRISM off in `chrome://extensions`.
 - On-device AI needs a recent desktop Chrome and a supported computer. When it is missing PRISM falls back to the web chat.
@@ -101,3 +113,4 @@ Plain JavaScript, HTML and CSS. No build step. See [AGENTS.md](AGENTS.md) for th
 ## License
 
 MIT, see [LICENSE](LICENSE). Bundled libraries and fonts: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
