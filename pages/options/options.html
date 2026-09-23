@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" data-theme="auto"><head><meta charset="utf-8"><title>PRISM settings</title><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="../../shared/ui.css"><link rel="stylesheet" href="options.css"></head>
+<body>
+  <div class="wrap">
+    <header class="row hd"><img class="logo" src="../../assets/icons/logo.svg" alt=""><h1 class="grow">PRISM</h1>
+      <select id="theme" style="width:auto"><option value="auto">Auto theme</option><option value="light">Light</option><option value="dark">Dark</option></select></header>
+    <section class="card welcome" id="welcome" hidden><h2>Welcome. Two things to do first.</h2>
+      <p class="muted">1. Choose where page features may run (below). Nothing runs on websites until you say so.<br>2. Pin PRISM: click the puzzle icon in Chrome's toolbar, then the pin next to PRISM. Press <kbd>Alt</kbd>+<kbd>K</kbd> anytime.</p></section>
+    <section class="card" id="access"><h2>Site access</h2>
+      <p class="muted small">Page features (form recovery, cookie reject, link hints, YouTube, Gmail...) only run on sites you allow here. Popup actions work on any page you click them on, without this.</p>
+      <div class="row wrap" id="packs"></div>
+      <div class="row" style="margin-top:10px"><input id="siteIn" placeholder="Add one site, e.g. naukri.com"><button class="btn" id="siteAdd">Allow</button></div>
+      <ul class="list" id="granted"></ul>
+    </section>
+    <div class="row bar"><input id="find" type="search" placeholder="Search 160 features"><span class="muted small" id="count"></span></div>
+    <div id="groups"></div>
+    <section class="card"><h2>Backup</h2><p class="muted small">Everything PRISM stores is on this computer only. Export it to move to another PC.</p>
+      <div class="row"><button class="btn" id="exp">Export all data</button><label class="btn">Import<input type="file" id="imp" accept=".json" hidden></label><button class="btn danger" id="reset">Reset settings</button></div></section>
+    <p class="faint small center">PRISM 0.1 · no accounts, no servers, no tracking · <a href="../tools/tools.html">Tools</a></p>
+  </div>
+  <script src="../../shared/registry.js"></script><script src="../../shared/store.js"></script><script src="../../shared/ui.js"></script><script src="options.js"></script>
+</body></html>

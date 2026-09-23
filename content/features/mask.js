@@ -1,0 +1,8 @@
+/* 128 PAN / Aadhaar / phone / email masking on the page, for screenshots. Toggle from the palette; the masked screenshot action uses it. */
+(() => { const P = window.__prism;
+  const RX = [[/\b[A-Z]{5}\d{4}[A-Z]\b/g, (m) => m.slice(0, 2) + '•••••••' + m.slice(-1)], [/\b\d{4}\s?\d{4}\s?\d{4}\b/g, (m) => 'XXXX XXXX ' + m.replace(/\s/g, '').slice(-4)], [/(\+91[\s-]?)?\b[6-9]\d{9}\b/g, (m) => m.slice(0, -10) + m.slice(-10, -8) + '••••••' + m.slice(-2)], [/\b[\w.+-]+@[\w-]+\.[\w.]+\b/g, (m) => m[0] + '•••@' + m.split('@')[1]]];
+  let orig = [];
+  const on = () => { if (orig.length) return 0; const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); const nodes = []; while (tw.nextNode()) nodes.push(tw.currentNode); for (const n of nodes) { if (n.parentElement.closest('script,style,prism-ui')) continue; let t = n.textContent, c = t; for (const [re, f] of RX) c = c.replace(re, f); if (c !== t) { orig.push([n, t]); n.textContent = c; } } document.querySelectorAll('input').forEach(i => { if (RX.some(([re]) => new RegExp(re.source).test(i.value))) { orig.push([i, i.value, 'v']); let c = i.value; for (const [re, f] of RX) c = c.replace(re, f); i.value = c; } }); return orig.length; };
+  const off = () => { orig.forEach(([n, t, v]) => v ? n.value = t : n.textContent = t); const k = orig.length; orig = []; return k; };
+  P.def('mask', { actions: { on, off, toggle() { if (orig.length) { off(); P.ui.toast('Unmasked'); return 'Unmasked'; } const n = on(); P.ui.toast(n ? 'Masked ' + n + ' items (PAN, Aadhaar, phone, email). Toggle again to undo.' : 'Nothing to mask found'); return n + ' masked'; } } });
+})();

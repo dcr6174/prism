@@ -1,0 +1,19 @@
+body > .wrap { max-width: 820px; margin: 0 auto; padding: 36px 24px 60px; }
+.hd { margin-bottom: 22px; } .hd .logo { width: 30px; height: 30px; }
+.card { margin-bottom: 16px; } .card h2 { margin-bottom: 6px; }
+.bar { position: sticky; top: 0; z-index: 3; padding: 12px 0; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); }
+.bar input, #packs { } .bar input { background: var(--surface); box-shadow: var(--shadow); }
+.grp { margin: 22px 0 8px; display: flex; align-items: baseline; gap: 10px; } .grp h2 { font-size: 15px; } .grp span { color: var(--ink3); font-size: 12px; }
+.feat { background: var(--surface); border-radius: var(--r); margin-bottom: 6px; box-shadow: var(--shadow); overflow: hidden; }
+.feat .top { display: flex; gap: 12px; align-items: center; padding: 12px 16px; cursor: pointer; }
+.feat .n { font-variant-numeric: tabular-nums; color: var(--ink3); width: 28px; font-size: 12px; }
+.feat .name { font-weight: 500; } .feat .d { color: var(--ink2); font-size: 12.5px; }
+.feat .cfg { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s var(--ease); }
+.feat.open .cfg { grid-template-rows: 1fr; } .feat .cfg > div { overflow: hidden; } .feat .cfg .in { padding: 0 16px 14px 56px; }
+.feat label.f { display: block; font-size: 12px; color: var(--ink2); margin: 8px 0 4px; }
+.feat .chev { color: var(--ink3); transition: transform .3s var(--spring); } .feat.open .chev { transform: rotate(90deg); }
+.pack { background: var(--sunk); border: 0; border-radius: 999px; padding: 7px 13px; cursor: pointer; font-size: 12.5px; }
+.pack.on { background: var(--accent-soft); color: var(--accent); }
+.center { text-align: center; margin-top: 30px; }
+.welcome { border: 1px solid var(--accent); }
+#packs { gap: 6px; margin: 12px 0 4px; } .row input[type=date] { width: 150px; flex: none; }

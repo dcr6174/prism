@@ -1,0 +1,6 @@
+body { display: grid; place-items: center; min-height: 100vh; }
+.b { max-width: 520px; text-align: center; padding: 24px; }
+.b .logo { width: 44px; height: 44px; margin-bottom: 28px; }
+.b h1 { font-size: 34px; letter-spacing: -.03em; line-height: 1.15; margin-bottom: 12px; }
+.ring { font-size: 44px; font-variant-numeric: tabular-nums; font-weight: 500; }
+#unlock { margin: 28px 0; }

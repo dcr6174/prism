@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "PRISM",
+  "short_name": "PRISM",
+  "version": "0.1.0",
+  "description": "160 small tools in one quiet extension. Local-first: no accounts, no servers, no tracking.",
+  "icons": { "16": "assets/icons/icon16.png", "32": "assets/icons/icon32.png", "48": "assets/icons/icon48.png", "128": "assets/icons/icon128.png" },
+  "action": { "default_popup": "pages/popup/popup.html", "default_title": "PRISM", "default_icon": { "16": "assets/icons/icon16.png", "32": "assets/icons/icon32.png" } },
+  "background": { "service_worker": "background/sw.js" },
+  "options_page": "pages/options/options.html",
+  "chrome_url_overrides": { "newtab": "pages/newtab/newtab.html" },
+  "minimum_chrome_version": "121",
+  "permissions": [
+    "storage", "unlimitedStorage", "tabs", "tabGroups", "bookmarks", "history", "sessions", "alarms", "notifications",
+    "contextMenus", "scripting", "activeTab", "declarativeNetRequest", "webNavigation", "downloads", "browsingData",
+    "cookies", "contentSettings", "idle", "favicon", "management", "tts", "clipboardWrite"
+  ],
+  "optional_host_permissions": ["<all_urls>"],
+  "commands": {
+    "_execute_action": { "suggested_key": { "default": "Alt+K" }, "description": "Open PRISM (command palette)" },
+    "copy-url": { "suggested_key": { "default": "Alt+Shift+U" }, "description": "Copy the current URL" },
+    "pomodoro-toggle": { "suggested_key": { "default": "Alt+Shift+P" }, "description": "Start / stop Pomodoro" },
+    "close-others": { "description": "Close other tabs" }
+  },
+  "web_accessible_resources": [{ "resources": ["assets/fonts/*", "assets/icons/*"], "matches": ["<all_urls>"] }],
+  "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'self'" }
+}

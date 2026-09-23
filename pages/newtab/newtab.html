@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head><meta charset="utf-8"><title>New tab</title><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="../../shared/ui.css"><link rel="stylesheet" href="newtab.css"></head>
+<body>
+  <main class="nt">
+    <header class="top fade-in">
+      <div data-feature="clock" class="clock"><div class="time" id="time"></div><div class="greet muted" id="greet"></div></div>
+      <div data-feature="weather" class="weather muted" id="weather"></div>
+    </header>
+    <section class="search fade-in" data-feature="onebox">
+      <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="Search, or type yt / gpt / = 12*18% ...   Ctrl+K">
+      <ul id="results" class="results"></ul>
+    </section>
+    <input data-feature="clock" id="focus" class="focus" placeholder="Today's one focus..." maxlength="120">
+    <section class="links fade-in" data-feature="quicklinks" id="links"></section>
+    <section class="grid">
+      <div class="card w" data-feature="todo"><h3>To-do</h3><ul id="todo" class="list todo"></ul><input id="todoIn" placeholder="Add a task, press Enter"></div>
+      <div class="card w" data-feature="countdowns"><h3>Countdowns</h3><ul id="cd" class="list"></ul><div class="row wrap"><input id="cdName" placeholder="Interview at ..." style="flex:1 1 100%"><input id="cdDate" type="date" style="flex:1;min-width:0"><button class="btn small" id="cdAdd">Add</button></div></div>
+      <div class="card w" data-feature="recentclosed"><h3>Recently closed</h3><ul id="closed" class="list"></ul></div>
+      <div class="card w" data-feature="tatkal"><h3>Tatkal</h3><div id="tatkal" class="tatkal"></div></div>
+      <div class="card w" data-feature="tasktimer"><h3>Task timer</h3><div id="timer"></div></div>
+      <div class="card w" data-feature="flashcards"><h3>Flashcards</h3><div id="flash"></div></div>
+    </section>
+    <footer class="foot faint small"><a href="../options/options.html">Settings</a> · <a href="../tools/tools.html">Tools</a> · PRISM 0.1</footer>
+  </main>
+  <script src="../../shared/registry.js"></script><script src="../../shared/store.js"></script><script src="../../shared/ui.js"></script>
+  <script src="../popup/actions.js"></script><script src="../popup/palette.js"></script><script src="newtab.js"></script>
+</body></html>
