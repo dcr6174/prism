@@ -87,18 +87,22 @@
 
   /* ---------------- Recording ---------------- */
   const pickStream = async (mic) => { const s = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: true, selfBrowserSurface: 'exclude', surfaceSwitching: 'include' }); if (mic) { try { const m = await navigator.mediaDevices.getUserMedia({ audio: true }); const ac = new AudioContext(); const dst = ac.createMediaStreamDestination(); if (s.getAudioTracks().length) ac.createMediaStreamSource(new MediaStream(s.getAudioTracks())).connect(dst); ac.createMediaStreamSource(m).connect(dst); return { stream: new MediaStream([...s.getVideoTracks(), ...dst.stream.getAudioTracks()]), stop: () => { s.getTracks().forEach(t => t.stop()); m.getTracks().forEach(t => t.stop()); ac.close(); } }; } catch (e) { toast('Mic not allowed, recording without it'); } } return { stream: s, stop: () => s.getTracks().forEach(t => t.stop()) }; };
-  const mime = () => ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m));
-  sec('recorder', { group: 'Capture', title: 'Screen recorder', sub: 'Record a tab, window or screen, with your mic. Saved as WebM on this computer.', feature: 'recorder', async render(b) {
+  /* MP4 first: Chrome records H.264/AAC MP4 natively (no conversion, no server). Older Chrome falls back to WebM. */
+  const mime = () => ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4;codecs=avc1,opus', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m));
+  const ext = (m) => /mp4/.test(m) ? 'mp4' : 'webm';
+  sec('recorder', { group: 'Capture', title: 'Screen recorder', sub: 'Record a tab, window or screen, with your mic. Download as MP4 (WebM only on older Chrome).', feature: 'recorder', async render(b) {
     const mic = h('input', { type: 'checkbox', checked: true, style: 'width:auto' }), cam = h('input', { type: 'checkbox', style: 'width:auto' }); const status = h('span', { class: 'muted' }); const vid = h('video', { class: 'prev', controls: true, hidden: true });
+    const saved = h('div', { class: 'stack' });
     let rec, src, t0, tick, camWin;
     const start = async () => { try { src = await pickStream(mic.checked); } catch (e) { return toast('Cancelled'); }
       if (cam.checked) camWin = window.open(chrome.runtime.getURL('pages/tools/tools.html#cambubble'), 'prismcam', 'width=260,height=260');
       const chunks = []; rec = new MediaRecorder(src.stream, { mimeType: mime(), videoBitsPerSecond: 4e6 }); rec.ondataavailable = e => e.data.size && chunks.push(e.data);
-      rec.onstop = () => { clearInterval(tick); src.stop(); camWin && camWin.close(); const bl = new Blob(chunks, { type: 'video/webm' }); vid.src = URL.createObjectURL(bl); vid.hidden = false; status.textContent = 'Done · ' + kb(bl.size); download(bl, 'recording-' + stamp() + '.webm'); go.textContent = 'Start recording'; go.classList.add('primary'); };
+      rec.onstop = () => { clearInterval(tick); src.stop(); camWin && camWin.close(); const m = rec.mimeType || mime(); const e = ext(m); const bl = new Blob(chunks, { type: e === 'mp4' ? 'video/mp4' : 'video/webm' }); const name = 'recording-' + stamp() + '.' + e; vid.src = URL.createObjectURL(bl); vid.hidden = false; status.textContent = 'Done · ' + kb(bl.size);
+        saved.prepend(h('div', { class: 'row wrap' }, btn('Download ' + e.toUpperCase(), () => download(bl, name), 'primary'), h('span', { class: 'muted small' }, name + ' · ' + kb(bl.size)), e === 'webm' ? h('span', { class: 'small risk-m' }, 'This Chrome cannot record MP4, so this is WebM.') : null)); go.textContent = 'Start recording'; go.classList.add('primary'); };
       src.stream.getVideoTracks()[0].onended = () => rec.state !== 'inactive' && rec.stop();
       rec.start(1000); t0 = Date.now(); tick = setInterval(() => { const s = Math.round((Date.now() - t0) / 1000); status.textContent = '● Recording ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }, 500); go.textContent = 'Stop'; go.classList.remove('primary'); };
     const go = btn('Start recording', () => rec && rec.state === 'recording' ? rec.stop() : start(), 'primary');
-    b.append(card(h('div', { class: 'row wrap' }, go, h('label', { class: 'row' }, mic, 'Microphone'), h('label', { class: 'row' }, cam, 'Webcam bubble (small window you can place over the screen)'), status), vid));
+    b.append(card(h('div', { class: 'row wrap' }, go, h('label', { class: 'row' }, mic, 'Microphone'), h('label', { class: 'row' }, cam, 'Webcam bubble (small window you can place over the screen)'), status), vid, saved));
   } });
   sec('cambubble', { group: 'Capture', title: 'Webcam', sub: '', hidden: true, async render(b) {
     document.body.innerHTML = ''; document.body.style.cssText = 'margin:0;background:#000;overflow:hidden';
@@ -111,7 +115,7 @@
     const newRec = () => { const r = { chunks: [], t: Date.now() }; r.mr = new MediaRecorder(src.stream, { mimeType: mime(), videoBitsPerSecond: 3e6 }); r.mr.ondataavailable = e => e.data.size && r.chunks.push(e.data); r.mr.start(1000); recs.push(r); if (recs.length > 2) { const old = recs.shift(); old.mr.state !== 'inactive' && old.mr.stop(); } };
     const start = async () => { try { src = await pickStream(false); } catch (e) { return toast('Cancelled'); } on = true; newRec(); timer = setInterval(newRec, SEG); src.stream.getVideoTracks()[0].onended = stop; status.textContent = '● Buffer running. Keep this tab open.'; go.textContent = 'Stop buffer'; };
     const stop = () => { on = false; clearInterval(timer); recs.forEach(r => r.mr.state !== 'inactive' && r.mr.stop()); recs = []; src && src.stop(); status.textContent = 'Stopped'; go.textContent = 'Start buffer'; };
-    const save = () => { if (!on || !recs.length) return toast('Start the buffer first'); const r = recs[0]; r.mr.requestData(); setTimeout(() => { const bl = new Blob(r.chunks, { type: 'video/webm' }); download(bl, 'replay-' + stamp() + '.webm'); toast('Saved last ' + Math.round((Date.now() - r.t) / 1000) + ' s'); }, 300); };
+    const save = () => { if (!on || !recs.length) return toast('Start the buffer first'); const r = recs[0]; r.mr.requestData(); setTimeout(() => { const e = ext(r.mr.mimeType || mime()); const bl = new Blob(r.chunks, { type: e === 'mp4' ? 'video/mp4' : 'video/webm' }); download(bl, 'replay-' + stamp() + '.' + e); toast('Saved last ' + Math.round((Date.now() - r.t) / 1000) + ' s'); }, 300); };
     const go = btn('Start buffer', () => on ? stop() : start(), 'primary');
     b.append(card(h('div', { class: 'row wrap' }, go, btn('Save last 30-60 s', save), status), h('p', { class: 'muted small' }, 'Uses memory while running (about 1-2 MB per 10 s). Nothing leaves your computer.')));
   } });

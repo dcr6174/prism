@@ -10,12 +10,12 @@
 
   // NEW TAB + LAUNCHER
   f(1, 'palette', 'Command palette', 'New tab + launcher', 'nt pop', true, 'Ctrl+K on the new tab, Alt+K anywhere. Search tabs, bookmarks, history and every PRISM action.');
-  f(2, 'aliases', 'Search aliases', 'New tab + launcher', 'nt pop', true, 'Type "yt lofi" or "gpt explain X" to search a site directly.', [t('aliases', 'Aliases (alias = URL with %s)', ['g = https://www.google.com/search?q=%s', 'yt = https://www.youtube.com/results?search_query=%s', 'gpt = https://chatgpt.com/?q=%s', 'cl = https://claude.ai/new?q=%s', 'ppx = https://www.perplexity.ai/search?q=%s', 'gh = https://github.com/search?q=%s', 'amz = https://www.amazon.in/s?k=%s', 'fk = https://www.flipkart.com/search?q=%s', 'nk = https://www.naukri.com/%s-jobs', 'li = https://www.linkedin.com/jobs/search/?keywords=%s', 'w = https://en.wikipedia.org/w/index.php?search=%s', 'maps = https://www.google.com/maps/search/%s'])]);
+  f(2, 'aliases', 'Search aliases', 'New tab + launcher', 'nt pop', true, 'Type the full site name first, like "youtube lofi" or "chatgpt explain X", to search that site directly.', [t('aliases', 'Search words (name = URL with %s)', ['google = https://www.google.com/search?q=%s', 'youtube = https://www.youtube.com/results?search_query=%s', 'chatgpt = https://chatgpt.com/?q=%s', 'claude = https://claude.ai/new?q=%s', 'gemini = https://gemini.google.com/app?q=%s', 'perplexity = https://www.perplexity.ai/search?q=%s', 'github = https://github.com/search?q=%s', 'amazon = https://www.amazon.in/s?k=%s', 'flipkart = https://www.flipkart.com/search?q=%s', 'naukri = https://www.naukri.com/%s-jobs', 'linkedin = https://www.linkedin.com/jobs/search/?keywords=%s', 'wikipedia = https://en.wikipedia.org/w/index.php?search=%s', 'maps = https://www.google.com/maps/search/%s'])]);
   f(3, 'onebox', 'One box search', 'New tab + launcher', 'nt pop', true, 'One search box over bookmarks, history and open tabs.');
   f(4, 'quicklinks', 'Quick links', 'New tab + launcher', 'nt', true, 'Grid of your favourite sites with custom icons.');
   f(5, 'clock', 'Clock, greeting, focus note', 'New tab + launcher', 'nt', true, 'Big clock, date, greeting and one line for today\'s focus.', [t('name', 'Your name', '')]);
   f(6, 'todo', 'Mini to-do', 'New tab + launcher', 'nt', true, 'A short local to-do list on the new tab.');
-  f(7, 'weather', 'Weather', 'New tab + launcher', 'nt', true, 'Free Open-Meteo forecast, no key.', [t('city', 'City', 'Bengaluru')]);
+  f(7, 'weather', 'Weather', 'New tab + launcher', 'nt', true, 'Free Open-Meteo forecast, no key. Asks for your city, or uses your location only if you click Use my location.', [t('city', 'City (leave blank and the new tab will ask you)', ''), t('lat', 'Latitude (filled by "Use my location")', ''), t('lon', 'Longitude (filled by "Use my location")', '')]);
   f(8, 'countdowns', 'Countdowns', 'New tab + launcher', 'nt', true, 'Days left to interviews and deadlines.');
   f(9, 'recentclosed', 'Recently closed', 'New tab + launcher', 'nt pop', true, 'Reopen tabs you closed by mistake.');
   // TABS & SESSIONS
@@ -151,7 +151,7 @@
   f(122, 'coupons', 'Coupon memory', 'Shopping', 'cs', true, 'Remembers codes you used per site.');
   // INDIA DAILY LIFE
   f(123, 'irctc', 'IRCTC passenger autofill', 'India daily life', 'site tool', true, 'Fill-only. No auto-submit, no captcha tricks.', [t('passengers', 'Passengers (name, age, M/F/T)', [])]);
-  f(124, 'tatkal', 'Tatkal countdown', 'India daily life', 'nt pop', true, 'Counts down to 10:00 (AC) and 11:00 (non-AC) IST.');
+  f(124, 'tatkal', 'Tatkal countdown', 'India daily life', 'nt pop', true, 'Big live countdown to 10:00 (AC) and 11:00 (non-AC) IST, with an Open-now alert and Book button.');
   f(125, 'jobfilter', 'Job-portal filter', 'India daily life', 'site', true, 'Hide promoted, reposted, applied and chosen companies.', [t('companies', 'Hide companies', []), t('hidePromoted', 'Hide promoted', true), t('hideApplied', 'Hide applied', true), t('hideReposted', 'Hide reposted', false)]);
   f(126, 'linkedinage', 'LinkedIn post age + applicants', 'India daily life', 'site', true, 'Shows how old a job is and applicant count on the card.');
   f(127, 'lakh', 'Lakh / crore converter', 'India daily life', 'cs nt pop', true, 'Select a number to see lakh/crore and million.');
@@ -176,7 +176,7 @@
   f(142, 'gmailunsub', 'Unsubscribe surfacer', 'Gmail helpers', 'site', true, 'Puts the unsubscribe link on top.');
   f(143, 'gmailattach', 'Forgot attachment?', 'Gmail helpers', 'site', true, 'Warns when mail says "attached" but has none.');
   // RECORDING
-  f(144, 'recorder', 'Screen recorder', 'Recording', 'tool', true, 'Tab or screen, mic, webcam bubble, saved as WebM.');
+  f(144, 'recorder', 'Screen recorder', 'Recording', 'tool', true, 'Tab or screen, mic, webcam bubble. Download as MP4 (WebM only if your Chrome cannot record MP4).');
   f(145, 'replay', 'Bug replay buffer', 'Recording', 'tool', true, 'Keeps the last ~30 s; save when a bug happens.');
   f(146, 'gif', 'GIF export', 'Recording', 'tool', true, 'Turn a short clip into a GIF.');
   // FOCUS / ADHD

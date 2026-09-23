@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "PRISM",
   "short_name": "PRISM",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "160 small tools in one quiet extension. Local-first: no accounts, no servers, no tracking.",
   "icons": { "16": "assets/icons/icon16.png", "32": "assets/icons/icon32.png", "48": "assets/icons/icon48.png", "128": "assets/icons/icon128.png" },
   "action": { "default_popup": "pages/popup/popup.html", "default_title": "PRISM", "default_icon": { "16": "assets/icons/icon16.png", "32": "assets/icons/icon32.png" } },
@@ -13,7 +13,7 @@
   "permissions": [
     "storage", "unlimitedStorage", "tabs", "tabGroups", "bookmarks", "history", "sessions", "alarms", "notifications",
     "contextMenus", "scripting", "activeTab", "declarativeNetRequest", "webNavigation", "downloads", "browsingData",
-    "cookies", "contentSettings", "idle", "favicon", "management", "tts", "clipboardWrite"
+    "cookies", "contentSettings", "idle", "favicon", "management", "tts", "clipboardWrite", "geolocation"
   ],
   "optional_host_permissions": ["<all_urls>"],
   "commands": {

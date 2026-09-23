@@ -16,6 +16,9 @@
     if (!saved) return d;
     Object.assign(d.on, saved.on || {});
     for (const id in saved.cfg || {}) d.cfg[id] = Object.assign(d.cfg[id] || {}, saved.cfg[id]);
+    // v0.1.1: short aliases (yt, gpt...) were replaced by full names; drop the old untouched default list.
+    const al = d.cfg.aliases && d.cfg.aliases.aliases;
+    if (Array.isArray(al) && al.length && al.every(x => /^(g|yt|gpt|cl|ppx|gh|amz|fk|nk|li|w|maps) = /.test(x))) d.cfg.aliases.aliases = S.defaults().cfg.aliases.aliases;
     if (saved.theme) d.theme = saved.theme;
     return d;
   };

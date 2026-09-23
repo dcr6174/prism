@@ -29,7 +29,7 @@ function clock() {
 async function links() {
   if (!S.on.quicklinks) return;
   const box = $('#links');
-  let list = await PrismStore.get('quicklinks', [{ title: 'Gmail', url: 'https://mail.google.com' }, { title: 'LinkedIn', url: 'https://www.linkedin.com/jobs' }, { title: 'Naukri', url: 'https://www.naukri.com' }, { title: 'GitHub', url: 'https://github.com' }, { title: 'ChatGPT', url: 'https://chatgpt.com' }, { title: 'YouTube', url: 'https://www.youtube.com' }]);
+  let list = await PrismStore.get('quicklinks', Palette.QUICKLINKS.slice());
   const draw = () => {
     box.innerHTML = '';
     list.forEach((l, i) => box.append(h('a', { href: l.url, title: l.url },
@@ -54,19 +54,40 @@ async function todo() {
   $('#todoIn').addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.value.trim()) { list.push({ text: e.target.value.trim(), done: false }); e.target.value = ''; save(); } });
   draw();
 }
+/* Weather (7): never guesses where you are. Uses the city you typed, or lat/lon saved only after you
+   click "Use my location" (browser geolocation). With neither, it asks. */
+const WCODES = { 0: 'Clear', 1: 'Mostly clear', 2: 'Partly cloudy', 3: 'Cloudy', 45: 'Fog', 48: 'Fog', 51: 'Drizzle', 53: 'Drizzle', 55: 'Drizzle', 61: 'Rain', 63: 'Rain', 65: 'Heavy rain', 71: 'Snow', 80: 'Showers', 81: 'Showers', 82: 'Heavy showers', 95: 'Thunderstorm', 96: 'Thunderstorm', 99: 'Thunderstorm' };
+async function saveWeatherCfg(patch) {
+  await PrismStore.patch(all => Object.assign(all.cfg.weather, patch)); Object.assign(S.cfg.weather, patch);
+  await PrismStore.set('weatherCache', null);
+}
+function askLocation(el, msg) {
+  el.innerHTML = '';
+  const inp = h('input', { placeholder: 'Your city', class: 'wcity' });
+  const setCity = async () => { const v = inp.value.trim(); if (!v) return inp.focus(); await saveWeatherCfg({ city: v, lat: '', lon: '' }); weather(); };
+  inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') setCity(); });
+  const geo = h('button', { class: 'btn small', onclick: () => {
+    geo.textContent = 'Locating...';
+    navigator.geolocation.getCurrentPosition(async (p) => { await saveWeatherCfg({ city: '', lat: String(+p.coords.latitude.toFixed(3)), lon: String(+p.coords.longitude.toFixed(3)) }); weather(); },
+      (e) => askLocation(el, 'Could not get your location (' + (e.message || 'blocked') + '). Type your city instead.'), { timeout: 12000, maximumAge: 36e5 });
+  } }, 'Use my location');
+  el.append(h('div', { class: 'wask' }, h('div', { class: 'small' }, msg || 'Where are you? For weather.'), h('div', { class: 'row' }, inp, h('button', { class: 'btn small primary', onclick: setCity }, 'Set')), geo));
+}
 async function weather() {
   if (!S.on.weather) return;
-  const el = $('#weather'); const city = S.cfg.weather.city || 'Bengaluru';
+  const el = $('#weather'); const c = S.cfg.weather; const city = (c.city || '').trim(); const lat = parseFloat(c.lat), lon = parseFloat(c.lon);
+  const hasGeo = isFinite(lat) && isFinite(lon);
+  if (!city && !hasGeo) return askLocation(el);
+  const key = city || lat + ',' + lon;
   const cache = await PrismStore.get('weatherCache', null);
-  const show = (w) => { el.innerHTML = ''; el.append(h('b', {}, Math.round(w.t) + '°'), w.desc + ' · ' + w.city, h('br'), 'H ' + Math.round(w.hi) + '° L ' + Math.round(w.lo) + '°'); };
-  if (cache && cache.city === city && Date.now() - cache.at < 30 * 60000) return show(cache);
+  const show = (w) => { el.innerHTML = ''; el.append(h('b', {}, Math.round(w.t) + '°'), w.desc + ' · ' + w.city, h('br'), 'H ' + Math.round(w.hi) + '° L ' + Math.round(w.lo) + '° · ', h('a', { href: '#', class: 'wchange', onclick: (e) => { e.preventDefault(); askLocation(el, 'Change location'); } }, 'change')); };
+  if (cache && cache.key === key && Date.now() - cache.at < 30 * 60000) return show(cache);
   try {
-    const g = await (await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&name=' + encodeURIComponent(city))).json();
-    const p = g.results[0];
+    let p = { latitude: lat, longitude: lon, name: 'Your location' };
+    if (city) { const g = await (await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&name=' + encodeURIComponent(city))).json(); if (!g.results || !g.results[0]) return askLocation(el, 'Could not find "' + city + '". Try another spelling.'); p = g.results[0]; }
     const f = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.latitude}&longitude=${p.longitude}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`)).json();
-    const codes = { 0: 'Clear', 1: 'Mostly clear', 2: 'Partly cloudy', 3: 'Cloudy', 45: 'Fog', 48: 'Fog', 51: 'Drizzle', 53: 'Drizzle', 55: 'Drizzle', 61: 'Rain', 63: 'Rain', 65: 'Heavy rain', 71: 'Snow', 80: 'Showers', 81: 'Showers', 82: 'Heavy showers', 95: 'Thunderstorm', 96: 'Thunderstorm', 99: 'Thunderstorm' };
-    const w = { city: p.name, t: f.current.temperature_2m, desc: codes[f.current.weather_code] || '—', hi: f.daily.temperature_2m_max[0], lo: f.daily.temperature_2m_min[0], at: Date.now() };
-    PrismStore.set('weatherCache', Object.assign({}, w, { city })); show(w);
+    const w = { key, city: p.name, t: f.current.temperature_2m, desc: WCODES[f.current.weather_code] || '-', hi: f.daily.temperature_2m_max[0], lo: f.daily.temperature_2m_min[0], at: Date.now() };
+    PrismStore.set('weatherCache', w); show(w);
   } catch (e) { el.textContent = 'Weather offline'; }
 }
 async function countdowns() {
@@ -106,12 +127,61 @@ function tatkalNext(hour) {
   const t = Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate(), hour, 0, 0) - 5.5 * 3600e3;
   return t > now ? t : t + 864e5;
 }
+/* Tatkal (124): a live countdown card. Rolling spring digits, a sliding "bubble" pill that morphs between
+   AC and Non-AC, soft blobs that speed up as the window gets close, and an Open-now state with a Book button. */
 function tatkal() {
   if (!S.on.tatkal) return;
-  const el = $('#tatkal');
-  const fmt = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return String(Math.floor(s / 3600)).padStart(2, '0') + ':' + String(Math.floor(s % 3600 / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
-  const tick = () => { el.innerHTML = ''; for (const [label, hr] of [['AC (10:00 IST)', 10], ['Non-AC (11:00 IST)', 11]]) el.append(h('div', { class: 'row' }, h('span', { class: 'muted' }, label), h('span', { class: 'big', style: { fontSize: '20px' } }, fmt(tatkalNext(hr) - Date.now())))); el.append(h('div', { class: 'faint small' }, 'Booking opens one day before travel.')); };
-  tick(); setInterval(tick, 1000);
+  const el = $('#tatkal'); const card = el.closest('.card'); card.classList.add('tk-card');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const kinds = [{ id: 'ac', label: 'AC', hr: 10, time: '10:00' }, { id: 'nonac', label: 'Non-AC', hr: 11, time: '11:00' }];
+  const openFor = (k) => { const t = tatkalNext(k.hr) - 864e5; return Date.now() >= t && Date.now() < t + 15 * 60000; };
+  const soonest = () => kinds.slice().sort((a, b) => (openFor(b) - openFor(a)) || (tatkalNext(a.hr) - tatkalNext(b.hr)))[0];
+  let cur = soonest(), manual = false;
+  el.innerHTML = '';
+  const blobs = h('div', { class: 'tk-blobs', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'));
+  const bubble = h('span', { class: 'tk-bubble' });
+  const pills = kinds.map(k => h('button', { class: 'tk-pill', onclick: () => { manual = true; pick(k); } }, h('b', {}, k.label), h('small', {}, k.time)));
+  const seg = h('div', { class: 'tk-seg' }, bubble, ...pills);
+  const slots = []; const digits = h('div', { class: 'tk-digits', role: 'timer', 'aria-live': 'off' });
+  ['h', 'h', ':', 'm', 'm', ':', 's', 's'].forEach((c) => {
+    if (c === ':') return digits.append(h('span', { class: 'tk-colon' }, ':'));
+    const slot = h('span', { class: 'tk-slot' }, h('span', { class: 'tk-d' }, '0')); slot.v = '0'; slots.push(slot); digits.append(slot);
+  });
+  const units = h('div', { class: 'tk-units' }, h('span', {}, 'hours'), h('span', {}, 'min'), h('span', {}, 'sec'));
+  const bar = h('div', { class: 'tk-bar' }, h('span'));
+  const note = h('div', { class: 'tk-note' });
+  const book = h('a', { class: 'btn primary tk-book', href: 'https://www.irctc.co.in/nget/train-search', target: '_blank' }, 'Book on IRCTC');
+  el.append(blobs, seg, digits, units, bar, h('div', { class: 'tk-foot' }, note, book));
+  const moveBubble = () => {
+    const i = kinds.indexOf(cur); const p = pills[i];
+    bubble.style.width = p.offsetWidth + 'px'; bubble.style.transform = `translateX(${p.offsetLeft - 4}px)`;
+    pills.forEach((x, j) => x.classList.toggle('on', j === i));
+    if (!reduce) { bubble.classList.remove('jelly'); void bubble.offsetWidth; bubble.classList.add('jelly'); }
+  };
+  const setDigit = (slot, v, animate) => {
+    if (slot.v === v) return; slot.v = v;
+    const old = slot.lastChild; const n = h('span', { class: 'tk-d' + (animate && !reduce ? ' in' : '') }, v);
+    if (animate && !reduce) { old.classList.add('out'); setTimeout(() => old.remove(), 520); } else old.remove();
+    slot.append(n);
+  };
+  const pick = (k) => { cur = k; moveBubble(); card.classList.remove('tk-morph'); void card.offsetWidth; if (!reduce) card.classList.add('tk-morph'); draw(false); };
+  const draw = (animate = true) => {
+    if (!manual) { const s = soonest(); if (s !== cur) { cur = s; moveBubble(); } }
+    const open = openFor(cur); const left = tatkalNext(cur.hr) - Date.now();
+    const sec = Math.max(0, Math.floor(left / 1000));
+    const str = String(Math.floor(sec / 3600)).padStart(2, '0') + String(Math.floor(sec % 3600 / 60)).padStart(2, '0') + String(sec % 60).padStart(2, '0');
+    if (open) '000000'.split('').forEach((d, i) => setDigit(slots[i], d, animate)); else str.split('').forEach((d, i) => setDigit(slots[i], d, animate));
+    bar.firstChild.style.transform = `scaleX(${open ? 1 : Math.min(1, 1 - left / 864e5)})`;
+    const state = open ? 'open' : sec <= 300 ? 'now' : sec <= 3600 ? 'soon' : 'far';
+    card.dataset.tk = state;
+    note.textContent = open ? cur.label + ' Tatkal is OPEN - go now' : state === 'now' ? 'Get ready - log in to IRCTC now' : state === 'soon' ? 'Under an hour. Keep your passenger list ready.' : 'Opens ' + cur.time + ' IST, one day before travel';
+    book.hidden = !(open || state === 'now');
+  };
+  requestAnimationFrame(() => { moveBubble(); bubble.classList.remove('jelly'); });
+  addEventListener('resize', moveBubble);
+  draw(false);
+  const loop = () => { draw(true); setTimeout(loop, 1000 - Date.now() % 1000 + 5); };
+  setTimeout(loop, 1000 - Date.now() % 1000 + 5);
 }
 async function timer() {
   if (!S.on.tasktimer) return;

@@ -7,12 +7,12 @@ Every feature has an on/off switch in Settings. "Where" tells you how you reach 
 | # | Feature | What it does | Where |
 |---|---|---|---|
 | 1 | Command palette | Ctrl+K on the new tab, Alt+K anywhere. Search tabs, bookmarks, history and every PRISM action. | New tab, Popup / Alt+K |
-| 2 | Search aliases | Type "yt lofi" or "gpt explain X" to search a site directly. | New tab, Popup / Alt+K |
+| 2 | Search aliases | Type the full site name first, like "youtube lofi" or "chatgpt explain X", to search that site directly. | New tab, Popup / Alt+K |
 | 3 | One box search | One search box over bookmarks, history and open tabs. | New tab, Popup / Alt+K |
 | 4 | Quick links | Grid of your favourite sites with custom icons. | New tab |
 | 5 | Clock, greeting, focus note | Big clock, date, greeting and one line for today's focus. | New tab |
 | 6 | Mini to-do | A short local to-do list on the new tab. | New tab |
-| 7 | Weather | Free Open-Meteo forecast, no key. | New tab |
+| 7 | Weather | Free Open-Meteo forecast, no key. Asks for your city, or uses your location only if you click Use my location. | New tab |
 | 8 | Countdowns | Days left to interviews and deadlines. | New tab |
 | 9 | Recently closed | Reopen tabs you closed by mistake. | New tab, Popup / Alt+K |
 
@@ -224,7 +224,7 @@ Every feature has an on/off switch in Settings. "Where" tells you how you reach 
 | # | Feature | What it does | Where |
 |---|---|---|---|
 | 123 | IRCTC passenger autofill | Fill-only. No auto-submit, no captcha tricks. | On listed sites, Tools page |
-| 124 | Tatkal countdown | Counts down to 10:00 (AC) and 11:00 (non-AC) IST. | New tab, Popup / Alt+K |
+| 124 | Tatkal countdown | Big live countdown to 10:00 (AC) and 11:00 (non-AC) IST, with an Open-now alert and Book button. | New tab, Popup / Alt+K |
 | 125 | Job-portal filter | Hide promoted, reposted, applied and chosen companies. | On listed sites |
 | 126 | LinkedIn post age + applicants | Shows how old a job is and applicant count on the card. | On listed sites |
 | 127 | Lakh / crore converter | Select a number to see lakh/crore and million. | On pages, New tab, Popup / Alt+K |
@@ -269,7 +269,7 @@ Every feature has an on/off switch in Settings. "Where" tells you how you reach 
 
 | # | Feature | What it does | Where |
 |---|---|---|---|
-| 144 | Screen recorder | Tab or screen, mic, webcam bubble, saved as WebM. | Tools page |
+| 144 | Screen recorder | Tab or screen, mic, webcam bubble. Download as MP4 (WebM only if your Chrome cannot record MP4). | Tools page |
 | 145 | Bug replay buffer | Keeps the last ~30 s; save when a bug happens. | Tools page |
 | 146 | GIF export | Turn a short clip into a GIF. | Tools page |
 

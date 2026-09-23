@@ -7,6 +7,7 @@
     let s = 0; for (const w of q.split(/\s+/)) { const i = text.indexOf(w); if (i < 0) return 0; s += i === 0 ? 3 : text[i - 1] === ' ' ? 2 : 1; }
     return s;
   };
+  const QUICKLINKS = [{ title: 'Gmail', url: 'https://mail.google.com' }, { title: 'LinkedIn', url: 'https://www.linkedin.com/jobs' }, { title: 'Naukri', url: 'https://www.naukri.com' }, { title: 'GitHub', url: 'https://github.com' }, { title: 'ChatGPT', url: 'https://chatgpt.com' }, { title: 'YouTube', url: 'https://www.youtube.com' }];
   const fav = (url) => chrome.runtime.getURL('/_favicon/?pageUrl=' + encodeURIComponent(url) + '&size=32');
   g.Palette = {
     async search(q, settings, ctx) {
@@ -27,7 +28,12 @@
       for (const a of g.PRISM_ACTIONS || []) {
         if (a.feature !== 'core' && !on(a.feature)) continue;
         if (a.page && !ctx.page) continue;
-        const s = score(a.label + ' ' + a.feature, lq); if (s) out.push({ kind: 'action', title: a.label, sub: 'PRISM action', action: a, s: s + 2 });
+        const s = score(a.label + ' ' + a.feature, lq); if (s) out.push({ kind: 'action', title: a.label, sub: 'PRISM action', action: a, s });
+      }
+      // your quick-link apps (4) always rank above actions
+      if (on('quicklinks')) {
+        const ql = await PrismStore.get('quicklinks', QUICKLINKS);
+        for (const l of ql || []) { const s = score(l.title + ' ' + l.url.replace(/^https?:\/\/(www\.)?/, ''), lq); if (s) out.push({ kind: 'app', title: l.title, sub: l.url, url: l.url, icon: l.icon && /^https?:/.test(l.icon) ? l.icon : fav(l.url), s }); }
       }
       if (on('findtab') || on('onebox') || on('palette')) {
         const tabs = await chrome.tabs.query({});
@@ -39,7 +45,10 @@
         for (const h of hist) if (!out.some(o => o.url === h.url)) out.push({ kind: 'history', title: h.title || h.url, sub: h.url, url: h.url, icon: fav(h.url), s: score(h.title + ' ' + h.url, lq) * 0.8 });
       }
       const head = out.filter(o => o.kind === 'calc' || o.kind === 'search');
-      const rest = out.filter(o => !head.includes(o)).sort((a, b) => b.s - a.s).slice(0, 14);
+      // order: calc/search words, then your apps, then open tabs + bookmarks, then PRISM actions, then history
+      const tier = { app: 0, tab: 1, bookmark: 1, action: 2, history: 3 };
+      const seen = new Set(); const rest = out.filter(o => !head.includes(o)).filter(o => { if (o.kind !== 'app' && o.kind !== 'bookmark' && o.kind !== 'history') return true; const k = o.url.replace(/\/$/, ''); if (seen.has(k)) return false; seen.add(k); return true; })
+        .sort((a, b) => (tier[a.kind] - tier[b.kind]) || (b.s - a.s)).slice(0, 14);
       const looksUrl = /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(q) || /^https?:\/\//.test(q);
       const tail = [{ kind: 'web', title: (looksUrl ? 'Open ' : 'Search Google for ') + q, url: looksUrl ? (/^https?:/.test(q) ? q : 'https://' + q) : 'https://www.google.com/search?q=' + encodeURIComponent(q) }];
       return head.concat(rest, tail);
@@ -50,7 +59,7 @@
       if (item.url) { if (newTab) await chrome.tabs.create({ url: item.url }); else await chrome.tabs.update({ url: item.url }); return null; }
       if (item.action) { const r = await item.action.run(ctx); if (r && r.error) return r.error; return item.action.done ? item.action.done(r) : (typeof r === 'string' ? r : 'Done'); }
     },
-    fav,
+    fav, QUICKLINKS,
     /* wires an <input> + <ul> into a keyboard-driven palette */
     bind(input, list, settings, ctxFn, onDone) {
       let items = [], sel = 0, seq = 0;
