@@ -12,7 +12,6 @@
           ed.focus();
           if (ed.tagName === 'TEXTAREA') { const set = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set; set.call(ed, h.text); ed.dispatchEvent(new Event('input', { bubbles: true })); }
           else document.execCommand('insertText', false, h.text);
-          if (h.autosubmit) setTimeout(() => { const b = document.querySelector('button[data-testid="send-button"], button[aria-label*="Send" i], button.send-button'); if (b && !b.disabled) b.click(); }, 700);
           return;
         }
         await new Promise(r => setTimeout(r, 400));
@@ -27,3 +26,4 @@
     },
   });
 })();
+

@@ -12,6 +12,7 @@ let S;
     addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); q.focus(); q.select(); } });
   }
   clock(); links(); todo(); weather(); countdowns(); closed(); tatkal(); timer(); pomodoro(); flash();
+  await NewTabCustomize.init(S); NewTabWidgets.init(S);
 })();
 
 function clock() {
@@ -250,3 +251,4 @@ async function flash() {
   const btns = h('div', { class: 'row' }, h('button', { class: 'btn small', onclick: () => { if (!shown) { a.hidden = false; shown = true; btns.replaceChildren(h('button', { class: 'btn small', onclick: grade(0) }, 'Again'), h('button', { class: 'btn small', onclick: grade(1) }, 'Good'), h('button', { class: 'btn small primary', onclick: grade(2) }, 'Easy')); } } }, 'Show answer'));
   box.append(h('div', { class: 'faint small' }, due.length + ' due'), q, a, btns);
 }
+

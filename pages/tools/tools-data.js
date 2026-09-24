@@ -76,12 +76,22 @@
   } });
 
   /* ---------------- Reading ---------------- */
-  sec('readlist', { group: 'Reading', title: 'Reading list', sub: 'Pages saved with an offline text copy.', feature: 'readlist', async render(b, q) {
+  sec('readlist', { group: 'Reading', title: 'Reading list', sub: 'Pages saved with an offline text copy. Search and mark what you have read.', feature: 'readlist', async render(b, q) {
     const l = await S.get('readlist', []); const id = q.get('id');
     if (id) { const it = l.find(x => x.id === id); if (!it) return b.append(empty('Not found')); b.append(h('p', {}, link(it.url, 'Open original'), ' · ', h('a', { href: '#readlist' }, 'Back')), card(h('h2', {}, it.title), h('div', { class: 'gap' }), h('div', { style: 'white-space:pre-wrap;line-height:1.7;font-size:16px' }, it.text))); return; }
     if (!l.length) return b.append(empty('Nothing saved. Alt+K, "Save to reading list".'));
-    b.append(card(h('ul', { class: 'list' }, l.map(it => liItem(it.url, it.title, (it.read ? 'Read · ' : '') + UI.ago(it.t) + ' · ' + Math.round((it.text || '').split(/\s+/).length / 220) + ' min', h('a', { class: 'btn small', href: '#readlist?id=' + it.id }, 'Offline copy'),
-      btn(it.read ? 'Unread' : 'Mark read', async () => { await S.update('readlist', [], x => { const y = x.find(z => z.id === it.id); y.read = !y.read; }); rerender(); }), btn('Delete', async () => { await S.update('readlist', [], x => x.filter(y => y.id !== it.id)); rerender(); }, 'danger'))))));
+    const search = h('input', { type:'search', placeholder:'Search saved pages', 'aria-label':'Search reading list' });
+    const status = h('select', { 'aria-label':'Reading status' }, h('option',{value:'all'},'All pages'),h('option',{value:'unread'},'Unread'),h('option',{value:'read'},'Read'));
+    const list = h('ul', { class:'list' });
+    const draw = () => {
+      const term = search.value.toLowerCase().trim();
+      const shown = l.filter(it => (status.value === 'all' || (status.value === 'read') === !!it.read) && (!term || (it.title + ' ' + it.url + ' ' + (it.text || '')).toLowerCase().includes(term)));
+      list.replaceChildren(...shown.map(it => liItem(it.url, it.title, (it.read ? 'Read · ' : '') + UI.ago(it.t) + ' · ' + Math.max(1,Math.round((it.text || '').split(/\s+/).length / 220)) + ' min', h('a', { class:'btn small', href:'#readlist?id=' + encodeURIComponent(it.id) }, 'Offline copy'),
+        btn(it.read ? 'Unread' : 'Mark read', async () => { await S.update('readlist', [], x => { const y=x.find(z=>z.id===it.id); if(y)y.read=!y.read; }); rerender(); }), btn('Delete', async () => { await S.update('readlist', [], x => x.filter(y=>y.id!==it.id)); rerender(); }, 'danger'))));
+      if (!shown.length) list.append(h('li', {class:'muted'}, 'No pages match.'));
+    };
+    search.oninput=draw; status.onchange=draw;
+    b.append(card(h('div',{class:'row wrap'},search,status),h('div',{class:'gap'}),list)); draw();
   } });
   sec('highlights', { group: 'Reading', title: 'Highlights', sub: 'Everything you highlighted, by page. Export as Markdown or make flashcards.', feature: 'highlights', async render(b) {
     const all = await S.get('highlights', {}); const pages = Object.entries(all).filter(([, p]) => p.items && p.items.length);
@@ -149,11 +159,12 @@
   const STAGES = [['saved', 'Saved'], ['applied', 'Applied'], ['interview', 'Interview'], ['offer', 'Offer'], ['rejected', 'Closed']];
   sec('jobs', { group: 'Career', title: 'Job tracker', sub: 'Save a job page with Alt+K, "Save job". Move it along here. Deadlines show on the new tab.', feature: 'jobtracker', async render(b) {
     const l = await S.get('jobs', []);
-    const csv = () => ['role,company,location,status,deadline,saved,url,notes'].concat(l.map(j => [j.role, j.company, j.location, j.status, j.deadline, new Date(j.saved).toISOString().slice(0, 10), j.url, j.notes].map(x => '"' + String(x || '').replace(/"/g, '""') + '"').join(','))).join('\n');
+    const csv = () => ['role,company,location,status,deadline,followUp,saved,url,notes'].concat(l.map(j => [j.role, j.company, j.location, j.status, j.deadline, j.followUp, new Date(j.saved || Date.now()).toISOString().slice(0, 10), j.url, j.notes].map(x => '"' + String(x || '').replace(/"/g, '""') + '"').join(','))).join('\n');
     b.append(h('div', { class: 'row' }, h('span', { class: 'muted grow' }, l.length + ' jobs'), btn('Export CSV', () => download(new Blob([csv()], { type: 'text/csv' }), 'jobs.csv'))), h('div', { class: 'gap' }));
     const upd = async (id, f) => { await S.update('jobs', [], x => { const j = x.find(y => y.id === id); if (j) f(j); }); rerender(); };
     b.append(h('div', { class: 'grid' }, STAGES.map(([k, name]) => { const js = l.filter(j => (j.status || 'saved') === k); return h('div', { class: 'col' }, h('h3', {}, name, h('span', { class: 'muted' }, js.length)),
       js.map(j => h('div', { class: 'jcard' }, h('a', { href: j.url, target: '_blank' }, j.role || 'Role'), h('div', { class: 'muted' }, [j.company, j.location].filter(Boolean).join(' · ')), j.deadline ? h('div', { class: 'pill' }, 'Apply by ' + j.deadline) : null,
+        h('label', { class:'small muted', style:'display:block;margin-top:8px' }, 'Follow up', h('input', { type:'date', value:j.followUp || '', 'aria-label':'Follow-up date for ' + (j.role || 'job'), onchange:e=>upd(j.id, x=>x.followUp=e.target.value) })),
         h('textarea', { rows: 2, placeholder: 'Notes', style: 'margin-top:6px;min-height:40px', onchange: e => upd(j.id, x => x.notes = e.target.value) }, j.notes || ''),
         h('div', { class: 'row', style: 'margin-top:6px' }, h('select', { onchange: e => upd(j.id, x => x.status = e.target.value) }, STAGES.map(([v, n]) => h('option', { value: v, selected: v === k }, n))), btn('×', async () => { if (confirm('Delete this job?')) { await S.update('jobs', [], x => x.filter(y => y.id !== j.id)); rerender(); } }, 'ghost'))))); })));
   } });
@@ -218,3 +229,4 @@
     b.append(card(h('ul', { class: 'list' }, l.map(x => liItem(x.url, x.title, (x.error ? x.error + ' · ' : '') + 'checked ' + UI.ago(x.last) + (x.changed ? ' · changed ' + UI.ago(x.changed) : ''), btn('Stop', async () => { await S.update('monitors', [], a => a.filter(y => y.id !== x.id)); rerender(); }, 'danger'))))));
   } });
 })();
+
