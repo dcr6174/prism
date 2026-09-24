@@ -3,15 +3,16 @@
 <link rel="stylesheet" href="../../shared/ui.css"><link rel="stylesheet" href="../newtab/newtab.css"><link rel="stylesheet" href="popup.css"></head>
 <body>
   <div class="pp">
-    <div class="row head"><img class="logo" src="../../assets/icons/logo.svg" alt=""><input id="q" type="search" placeholder="Search tabs, actions, or = math" autocomplete="off"></div>
+    <header class="pp-header"><div class="row pp-brand"><img class="logo" src="../../assets/icons/logo.svg" alt=""><strong>PRISM</strong><span class="grow"></span><span class="pp-label">YOUR TOOLKIT</span></div><h1>What can we do?</h1><p class="muted small">Tools for this page and everything else, one search away.</p></header><div class="pp-search"><span aria-hidden="true">⌕</span><input id="q" type="search" placeholder="Search actions, tabs, pages…" aria-label="Search PRISM" autocomplete="off"><kbd>Alt K</kbd></div>
     <ul id="results" class="results"></ul>
-    <nav class="tabs" id="tabs"><button data-t="page" class="on">Page</button><button data-t="focus">Focus</button><button data-t="notes">Notes</button><button data-t="accounts">Accounts</button></nav>
-    <section data-p="page" id="page"></section>
+    <nav class="tabs" id="tabs" aria-label="Popup sections"><button data-t="home" class="on" aria-selected="true">Home</button><button data-t="page" aria-selected="false">Page</button><button data-t="focus" aria-selected="false">Focus</button><button data-t="notes" aria-selected="false">Notes</button><button data-t="accounts" aria-selected="false">Accounts</button></nav>
+    <section data-p="home" id="home"></section><section data-p="page" hidden id="page"></section>
     <section data-p="focus" hidden id="focus"></section>
     <section data-p="notes" hidden id="notes"></section>
     <section data-p="accounts" hidden id="accounts"></section>
-    <footer class="row small faint"><a href="#" id="opt">Settings</a><span class="grow"></span><a href="#" id="tools">All tools</a></footer>
+    <footer class="row small faint"><a href="#" id="opt">⚙ Settings</a><span class="grow"></span><span id="featureCount"></span><a href="#" id="tools">All tools ↗</a></footer>
   </div>
   <script src="../../shared/registry.js"></script><script src="../../shared/store.js"></script><script src="../../shared/ui.js"></script>
   <script src="actions.js"></script><script src="palette.js"></script><script src="popup.js"></script>
 </body></html>
+

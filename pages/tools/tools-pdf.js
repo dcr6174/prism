@@ -46,14 +46,14 @@
     function drawFiles() {
       list.replaceChildren();
       files.forEach((file, i) => {
-        const move = (delta) => { if (busy) return; const next = i + delta; [files[i], files[next]] = [files[next], files[i]]; drawFiles(); };
+        const move = (delta) => { if (busy) return; const next = i + delta; if(next<0 || next>=files.length)return; [files[i], files[next]] = [files[next], files[i]]; drawFiles(); };
         list.append(h('li', {}, h('span', { class: 'file-mark', 'aria-hidden': 'true' }, 'PDF'), h('div', { class: 'grow' }, h('strong', { class: 'filename' }, file.name), h('div', { class: 'muted small' }, file.count + ' pages · ' + T.kb(file.bytes.byteLength))),
           h('button', { class: 'btn small', disabled: i === 0, 'aria-label': 'Move ' + file.name + ' up', onclick: () => move(-1) }, '↑'),
           h('button', { class: 'btn small', disabled: i === files.length - 1, 'aria-label': 'Move ' + file.name + ' down', onclick: () => move(1) }, '↓'),
           h('button', { class: 'btn small ghost', 'aria-label': 'Remove ' + file.name, onclick: () => { if (!busy) { files.splice(i, 1); drawFiles(); } } }, '×')));
       });
       summary.textContent = files.length ? files.length + ' file' + (files.length === 1 ? '' : 's') + ' · ' + files.reduce((n, f) => n + f.count, 0) + ' pages' : 'No files yet';
-      run.disabled = !files.length || busy;
+      run.disabled = !files.length || busy; if(files.length>1 && mode!=='merge') { state.textContent='This tool uses one PDF. Remove extra files or choose Merge PDFs.'; state.dataset.error='true'; run.disabled=true; }
     }
     const drop = T.dropZone('Drop PDFs here, or click to browse', '.pdf,application/pdf', true, async fs => {
       if (busy) return; busy = true; controls.disabled = true; run.disabled = true;
@@ -92,11 +92,36 @@
       if (mode === 'optimize') settings.append(h('p', { class: 'notice' }, 'Lossless structural optimization. Images are not downsampled. Already optimized PDFs may stay the same size or become larger.'));
       if (mode === 'flatten') settings.append(h('p', { class: 'notice' }, 'Filled form values become fixed. Keep an editable original if you need to change them later.'));
       if (['merge', 'extract', 'split', 'remove', 'reorder', 'reverse'].includes(mode)) settings.append(h('p', { class: 'muted small' }, 'Page-copy operations may not retain interactive forms, bookmarks or document-level attachments.'));
-      run.textContent = mode === 'split' ? 'Split PDF' : 'Create PDF';
+      run.textContent = mode === 'split' ? 'Split PDF' : mode === 'merge' ? 'Merge PDFs' : op[1];
       state.textContent = mode === 'merge' ? 'Add PDFs and arrange them in order.' : 'Add one PDF to use this tool.';
-      state.dataset.error = ''; output.replaceChildren(); urls.forEach(URL.revokeObjectURL); urls = [];
+      state.dataset.error = ''; output.replaceChildren(); urls.forEach(URL.revokeObjectURL); urls = []; drawFiles();
     }
     const cards = h('div', { class: 'pdf-tool-grid', 'aria-label': 'PDF operations' }, operations.map(([id, name, desc, icon], index) => h('button', { type: 'button', class: 'pdf-tool', 'data-mode': id, 'data-tone': index % 5, onclick: () => { if (busy) return; mode = id; configure(); history.replaceState(null, '', '#pdf?mode=' + id); } }, h('span', { class: 'tool-icon', 'aria-hidden': 'true' }, icon), h('span', {}, h('strong', {}, name), h('small', {}, desc)))));
+    const categories = {
+      All: operations.map(o => o[0]),
+      Organize: ['merge','extract','split','remove','reorder','reverse','rotate','blank'],
+      Edit: ['watermark','numbers','crop','resize','metadata'],
+      Finish: ['flatten','attach','optimize']
+    };
+    let category = 'All';
+    const find = h('input', { type:'search', placeholder:'Find a PDF tool…', 'aria-label':'Find a PDF tool' });
+    const filters = h('div', { class:'pdf-filters', role:'group', 'aria-label':'PDF tool categories' });
+    const visible = h('span', { class:'muted small', role:'status' });
+    const filterCards = () => {
+      let n=0;
+      cards.querySelectorAll('.pdf-tool').forEach(card=>{
+        const op=operations.find(o=>o[0]===card.dataset.mode);
+        const show=categories[category].includes(op[0]) && (op[1]+' '+op[2]).toLowerCase().includes(find.value.toLowerCase().trim());
+        card.hidden=!show; if(show)n++;
+      });
+      visible.textContent=n+' tools';
+      filters.replaceChildren(...Object.keys(categories).map(name=>h('button',{class:'btn small'+(category===name?' primary':''),'aria-pressed':category===name,onclick:()=>{category=name;filterCards();}},name)));
+    };
+    find.oninput=filterCards;
+    const hero=h('div',{class:'pdf-hero'},
+      h('div',{},h('span',{class:'pdf-eyebrow'},'PRISM PDF STUDIO · PRIVATE BY DESIGN'),h('h2',{},'Every document, beautifully handled.'),h('p',{},'Pick a tool, add your PDFs, make your changes and download. Your files stay on this device.'),h('div',{class:'row wrap'},h('a',{class:'btn primary',href:'#sign'},'Fill & sign ↗'),h('a',{class:'btn',href:'#img2pdf'},'Images to PDF ↗'))),
+      h('div',{class:'pdf-hero-art','aria-hidden':'true'},h('span',{},'PDF'),h('i'),h('i'),h('i'),h('b',{},'✦')));
+    const steps=h('div',{class:'pdf-steps','aria-label':'PDF workflow'},h('span',{},'01  Choose a tool'),h('span',{},'02  Add files'),h('span',{},'03  Download'));
     run.onclick = async () => {
       if (busy) return; busy = true; controls.disabled = true; cards.querySelectorAll('button').forEach(c => c.disabled = true); run.disabled = true;
       urls.forEach(URL.revokeObjectURL); urls = []; output.replaceChildren(); state.dataset.error = ''; state.textContent = 'Working locally…';
@@ -121,7 +146,7 @@
       finally { busy = false; controls.disabled = false; cards.querySelectorAll('button').forEach(c => c.disabled = false); drawFiles(); }
     };
     controls.append(h('div', { class: 'row wrap studio-heading' }, title, summary), subtitle, drop, list, settings, h('div', { class: 'row wrap studio-actions' }, run, h('button', { class: 'btn ghost', onclick: () => { if (busy) return; files = []; drawFiles(); output.replaceChildren(); urls.forEach(URL.revokeObjectURL); urls = []; state.textContent = 'Workspace cleared.'; } }, 'Clear files')));
-    b.append(h('div', { class: 'row wrap studio-topline' }, h('span', { class: 'pill' }, '16 local PDF tools'), h('a', { class: 'btn small', href: '#sign' }, 'Fill & sign ↗'), h('a', { class: 'btn small', href: '#img2pdf' }, 'Images to PDF ↗')), cards, T.card(controls, state, output), h('details', { class: 'studio-limits' }, h('summary', {}, 'Supported files & honest limits'), h('p', {}, 'Works with unencrypted PDFs. PDF editing can invalidate existing digital signatures. A drawn signature is not a certificate-based digital signature. OCR, Office conversion, PDF-to-image rendering, password protection, PDF/A validation and secure redaction are not included. These need additional dedicated engines. Nothing is uploaded.')));
-    configure(); drawFiles();
+    b.append(hero, steps, h('div',{class:'pdf-directory-title row wrap'},h('div',{class:'grow'},h('h2',{},'Find your PDF tool'),h('p',{class:'muted small'},'16 focused tools for everyday document work.')),visible), h('div',{class:'pdf-directory-search'},find),filters,cards,T.card(controls, state, output), h('details', { class: 'studio-limits' }, h('summary', {}, 'Supported files & honest limits'), h('p', {}, 'Works with unencrypted PDFs. PDF editing can invalidate existing digital signatures. A drawn signature is not a certificate-based digital signature. OCR, Office conversion, PDF-to-image rendering, password protection, PDF/A validation and secure redaction are not included. These need additional dedicated engines. Nothing is uploaded.')));
+    configure(); filterCards(); drawFiles();
   } });
 })();
