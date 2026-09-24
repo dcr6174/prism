@@ -40,7 +40,7 @@
   f(26, 'aiproofread', 'On-device proofread', 'AI, no keys', 'pop cs', true, 'Proofread selected text on-device.');
   f(27, 'aisend', 'Send selection to chat', 'AI, no keys', 'bg', true, 'Right-click text -> ChatGPT / Claude / Gemini with a saved prompt.', [t('target', 'Default chat (chatgpt, claude, gemini, perplexity)', 'chatgpt')]);
   f(28, 'prompts', 'Prompt library', 'AI, no keys', 'bg tool', true, 'Prompts with {{text}} variables.');
-  f(29, 'aipage', 'Send page to chat', 'AI, no keys', 'pop site', true, 'Send the cleaned page as context; optional auto-submit.', [t('autosubmit', 'Auto-submit after filling', true)]);
+  f(29, 'aipage', 'Send page to chat', 'AI, no keys', 'pop site', true, 'Fill cleaned page context for you to review before sending.');
   // READING & CAPTURE
   f(30, 'markdown', 'Copy as Markdown', 'Reading & capture', 'pop', true, 'Page or selection as clean Markdown.');
   f(31, 'reader', 'Reader mode', 'Reading & capture', 'pop', true, 'Clutter-free reading view with font, width and dark controls.');
