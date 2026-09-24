@@ -9,15 +9,42 @@ const ctx = async () => ({ tab: TAB, page: isPage(TAB), input: '' });
   const q = $('#q');
   Palette.bind(q, $('#results'), S, ctx, (r, it) => { if (r) toast(r); if (it && it.action && it.action.close) setTimeout(() => window.close(), 250); if (it && (it.kind === 'tab' || it.url)) window.close(); });
   q.focus();
-  $('#tabs').onclick = (e) => { const t = e.target.dataset.t; if (!t) return; document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); document.querySelectorAll('[data-p]').forEach(s => s.hidden = s.dataset.p !== t); };
-  $('#opt').onclick = () => chrome.runtime.openOptionsPage();
-  $('#tools').onclick = () => chrome.tabs.create({ url: chrome.runtime.getURL('pages/tools/tools.html') });
-  page(); focus(); notes(); accounts();
+  $('#tabs').onclick = (e) => { const t = e.target.closest('button')?.dataset.t; if (!t) return; document.querySelectorAll('#tabs button').forEach(b => { b.classList.toggle('on', b.dataset.t === t); b.setAttribute('aria-selected', b.dataset.t === t); }); document.querySelectorAll('[data-p]').forEach(s => s.hidden = s.dataset.p !== t); };
+  $('#opt').onclick = e => { e.preventDefault(); chrome.runtime.openOptionsPage(); };
+  $('#tools').onclick = e => { e.preventDefault(); chrome.tabs.create({ url: chrome.runtime.getURL('pages/tools/tools.html') }); };
+  $('#featureCount').textContent = PRISM_FEATURES.filter(f => S.on[f.id]).length + ' / 160 on';
+  home().catch(e => { console.warn(e); $('#home').append(h('p', { class:'muted small' }, 'Overview unavailable. Search and other sections still work.')); }); page(); focus(); notes(); accounts();
 })();
 const run = async (a) => {
   try { const r = await a.run(await ctx()); if (r && r.error) return toast(r.error); toast(a.done ? a.done(r) : typeof r === 'string' ? r : 'Done'); if (a.close) setTimeout(() => window.close(), 300); }
   catch (e) { toast(String(e.message || e)); }
 };
+async function home() {
+  const box = $('#home');
+  const website = isPage(TAB);
+  const host = website ? U.host(TAB.url) : '';
+  let allowed = false;
+  if (website) {
+    try { allowed = await chrome.permissions.contains({ origins: [new URL(TAB.url).origin + '/*'] }); } catch (e) { console.warn(e); }
+  }
+  const site = h('div', { class:'pp-site' }, h('span', { class:'pp-site-icon', 'aria-hidden':'true' }, website ? (host[0] || '•').toUpperCase() : '✦'), h('div',{class:'grow'},h('strong',{},website ? host : 'Browser page'),h('small',{class:'muted'},website ? (allowed ? 'Page features allowed' : 'Page features need site access') : 'Open a website for page actions')), h('span',{class:'pp-status ' + (allowed ? 'allowed' : '')},allowed ? 'Allowed' : website ? 'Limited' : 'Ready'));
+  box.append(site);
+  const shortcuts = [
+    ['⊞', 'PDF Studio', 'pdf', 'lilac'], ['↗', 'Job tracker', 'jobs', 'peach'],
+    ['⌘', 'QA kit', 'testdata', 'mint'], ['◉', 'Record', 'recorder', 'blue']
+  ];
+  const open = hash => chrome.tabs.create({url:chrome.runtime.getURL('pages/tools/tools.html#' + hash)});
+  box.append(h('div',{class:'grp'},'Jump into'),h('div',{class:'pp-shortcuts'},...shortcuts.map(([icon,label,hash,tone])=>h('button',{class:'pp-shortcut '+tone,onclick:()=>open(hash)},h('span',{class:'pp-shortcut-icon','aria-hidden':'true'},icon),h('span',{},label)))));
+  const favorite = (await PrismStore.get('tools:favorites', [])).filter(x=>typeof x==='string');
+  const recent = (await PrismStore.get('tools:recent', [])).filter(x=>typeof x==='string');
+  const pinned = [...new Set([...favorite,...recent])].filter(x=>x!=='home').slice(0,6);
+  box.append(h('div',{class:'row pp-heading'},h('div',{class:'grp grow'},'Yours'),h('span',{class:'muted small'},favorite.length+' pinned')),
+    pinned.length ? h('div',{class:'chips pp-personal'},...pinned.map(id=>h('button',{class:'chip',onclick:()=>open(id)},favorite.includes(id)?'★ ':'↗ ',id==='pdf'?'PDF Studio':id.replace(/[-_]/g,' ')))) : h('div',{class:'pp-empty'},'Pin a tool from All tools. It will show up here.'));
+  const fast = [website ? 'Copy clean link' : 'Close duplicate tabs', website ? 'Full-page screenshot' : 'Open saved sessions', website ? 'Save to reading list (offline copy)' : 'Start Pomodoro'];
+  const acts = fast.map(label=>PRISM_ACTIONS.find(a=>a.label===label)).filter(a=>a&&S.on[a.feature]);
+  if (acts.length) box.append(h('div',{class:'grp'},'Quick actions'),h('div',{class:'pp-actions'},...acts.map(a=>h('button',{class:'pp-action',onclick:()=>run(a)},h('span',{},a.label),h('span',{'aria-hidden':'true'},'↗')))));
+  box.append(h('p',{class:'muted small pp-help'},'Search above to reach every available action, tab and bookmark.'));
+}
 function page() {
   const box = $('#page');
   const groups = [['Copy', ['Copy page as Markdown', 'Copy Markdown link', 'Copy clean link', 'Copy all links on page', 'Copy bug report block']],
@@ -83,3 +110,4 @@ function accounts() {
   for (let i = 0; i < 3; i++) box.append(h('div', { class: 'grp' }, 'Account /u/' + i), h('div', { class: 'chips' }, apps.map(([n, u]) => h('button', { class: 'chip', onclick: () => chrome.tabs.create({ url: u.replace('%d', i) }) }, n))));
   box.append(h('p', { class: 'faint small', style: { marginTop: '10px' } }, '/u/0 is the first account you signed in with, /u/1 the second, and so on.'));
 }
+
