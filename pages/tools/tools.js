@@ -44,6 +44,7 @@
     for (const fn of T.cleanups.splice(0)) { try { fn(); } catch (e) { console.warn(e); } }
     const requested = (location.hash.slice(1) || 'home').split('?')[0];
     const hash = T.secs[requested] ? requested : 'home'; const s = T.secs[hash];
+    if (['pdf','sign','img2pdf','compress'].includes(hash)) { location.replace(chrome.runtime.getURL('pages/pdf-studio/index.html#' + (hash === 'pdf' ? 'pdf' + (location.hash.includes('?') ? '?' + location.hash.split('?')[1] : '') : hash))); return; }
     T.active = hash;
     if (hash !== 'home' && !s.hidden) {
       const recent = await PrismStore.get('tools:recent', []);

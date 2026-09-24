@@ -100,7 +100,7 @@
   // LOST WORK & NAGS
   f(78, 'formrecover', 'Form-text recovery', 'Lost work & nags', 'cs', true, 'Autosaves what you type; restore after a crash.');
   f(79, 'leaveguard', 'Leave-page guard', 'Lost work & nags', 'cs', true, 'Warns before closing a tab with unsent text.');
-  f(80, 'undisable', 'Un-disable', 'Lost work & nags', 'pop cs', true, 'Re-enable greyed buttons, right-click and copy.');
+  f(80, 'undisable', 'Un-disable', 'Lost work & nags', 'pop cs', false, 'Re-enable greyed buttons, right-click and copy.');
   f(81, 'autocompletefix', 'Autocomplete fixer', 'Lost work & nags', 'cs', true, 'Turns browser autocomplete back on.');
   f(82, 'datepicker', 'Smart date picker', 'Lost work & nags', 'cs', true, 'Type "next fri" or "12/10" into date fields.');
   f(83, 'showpass', 'Show-password eye', 'Lost work & nags', 'cs', true, 'Eye button on password fields.');
@@ -147,7 +147,7 @@
   f(118, 'pricelog', 'Price log + chart', 'Shopping', 'site tool', true, 'Records prices on Amazon, Flipkart, Myntra pages you visit.');
   f(119, 'pricewatch', 'Price-drop watch', 'Shopping', 'bg tool', true, 'Re-checks watched products every few hours while Chrome is open.', [t('hours', 'Check every (hours)', 6)]);
   f(120, 'unitprice', 'Unit-price calculator', 'Shopping', 'cs', true, 'Shows Rs per 100g / per piece next to prices.');
-  f(121, 'fakediscount', 'Fake-discount flagger', 'Shopping', 'cs', true, 'Flags countdowns and "only N left" that reset.');
+  f(121, 'fakediscount', 'Fake-discount flagger', 'Shopping', 'cs', false, 'Flags countdowns and "only N left" that reset.');
   f(122, 'coupons', 'Coupon memory', 'Shopping', 'cs', true, 'Remembers codes you used per site.');
   // INDIA DAILY LIFE
   f(123, 'irctc', 'IRCTC passenger autofill', 'India daily life', 'site tool', true, 'Fill-only. No auto-submit, no captcha tricks.', [t('passengers', 'Passengers (name, age, M/F/T)', [])]);
@@ -168,7 +168,7 @@
   f(136, 'imgcompress', 'Image compress', 'PDF (local)', 'tool', true, 'Get an image under 200 KB (or any size) for portals.');
   // MULTI-ACCOUNT
   f(137, 'gaccounts', 'Google account switch', 'Multi-account', 'pop', true, 'Jump to Gmail/Drive/Calendar as /u/0, /u/1...');
-  f(138, 'containers', 'Site profiles (experimental)', 'Multi-account', 'tool', true, 'Swap cookie sets for one site to switch logins.');
+  f(138, 'containers', 'Site profiles (experimental)', 'Multi-account', 'tool', false, 'Swap cookie sets for one site to switch logins.');
   f(139, 'whichaccount', 'Which-account badge', 'Multi-account', 'site', true, 'Coloured badge with the signed-in Google account.');
   // GMAIL
   f(140, 'gmailtpl', 'Gmail templates', 'Gmail helpers', 'site', true, 'Insert a saved reply into compose.');
@@ -190,11 +190,11 @@
   // READING EXTRAS
   f(154, 'recipe', 'Recipe mode', 'Reading extras', 'pop cs', true, 'Ingredients and steps only.');
   f(155, 'pagemonitor', 'Page-change monitor', 'Reading extras', 'bg pop tool', true, 'Notifies when a page changes (while Chrome is open).', [t('hours', 'Check every (hours)', 3)]);
-  f(156, 'hoverpreview', 'Hover link preview', 'Reading extras', 'cs bg', true, 'Hold Shift over a link for a preview card.');
+  f(156, 'hoverpreview', 'Hover link preview', 'Reading extras', 'cs bg', false, 'Hold Shift over a link for a preview card.');
   f(157, 'pubdate', 'Real publish date', 'Reading extras', 'cs pop', true, 'Shows the real published / updated date.');
   // TRUST & SAFETY
   f(158, 'suslink', 'Suspicious-link warning', 'Trust & safety', 'cs', true, 'Warns on lookalike, punycode and shortened links.');
-  f(159, 'newsite', 'New-site badge', 'Trust & safety', 'cs bg', true, 'Tells you when you have never been to a site before.');
+  f(159, 'newsite', 'New-site badge', 'Trust & safety', 'cs bg', false, 'Tells you when you have never been to a site before.');
   f(160, 'extaudit', 'Extension permission audit', 'Trust & safety', 'tool', true, 'Your extensions ranked by risk.');
 
   g.PRISM_FEATURES = L;
